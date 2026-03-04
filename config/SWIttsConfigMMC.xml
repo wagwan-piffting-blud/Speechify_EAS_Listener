@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>  <!-- XML version -->
+<?xml-stylesheet type="text/xsl" href="SWIttsConfig.xsl"?>
+
+<!-- Speechify configuration file -->
+<!-- Copyright (c) 2001-2003 SpeechWorks International, Inc. -->
+<!-- All Rights Reserved -->
+
+<!-- Define the structure for the XML -->
+
+<!DOCTYPE SWIttsConfig SYSTEM "SWIttsConfig.dtd">
+
+<!-- *************** CONFIG PARAMETERS ************* -->
+
+<SWIttsConfig version="1.0.0">
+<lang name="Default">
+
+  <!-- *** DIAGNOSTIC LOGGING *** -->
+
+  <param name="tts.log.diagnostic.toStdout">
+     <value> true </value>
+  </param>
+
+  <param name="tts.log.diagnostic.toSystemLog">
+     <value> true </value>
+  </param>
+
+  <param name="tts.log.diagnostic.file">
+     <value> </value>
+     <!-- <value> ${TMPDIR}/SWIttsDiagnosticLog_MMC.txt </value> -->
+  </param>
+
+  <param name="tts.log.diagnostic.fileMimeType">
+     <value> text/plain;charset=UTF-8 </value>
+     <!-- <value> text/plain;charset=ISO-8859-1 </value> -->
+  </param>
+
+  <param name="tts.log.diagnostic.fileMaxSizeMB">
+     <value> 50 </value>
+  </param>
+
+  <param name="tts.log.diagnostic.fileWriteMode">
+     <value> flushAfterWrite </value>
+  </param>
+
+  <param name="tts.log.diagnostic.reportErrorText">
+     <value> true </value>
+  </param>
+
+  <param name="tts.log.diagnostic.errorMapFile">
+     <value> ${SWITTSSDK}/doc/SpeechifyErrors.en-US.xml </value>
+  </param>
+
+
+  <!-- *** DIAGNOSTIC TAG ENABLE/DISABLE *** -->
+
+  <param name="tts.log.diagnostic.tags">
+    <namedValue name="9500"> true </namedValue>
+    <namedValue name="9501"> true </namedValue>
+  </param>
+
+</lang>
+
+</SWIttsConfig>

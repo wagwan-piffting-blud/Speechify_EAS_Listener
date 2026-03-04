@@ -1,0 +1,52 @@
+BODY {
+	FONT-SIZE: x-small; FONT-FAMILY: tahoma
+}
+TD {
+	FONT-SIZE: x-small; FONT-FAMILY: tahoma
+}
+.boldWhite {
+	FONT-WEIGHT: bold; FONT-SIZE: x-small; COLOR: #ffffff; FONT-FAMILY: tahoma
+}
+.boldGray {
+	FONT-WEIGHT: bold; FONT-SIZE: x-small; COLOR: #666666; FONT-FAMILY: tahoma
+}
+.leftnav {
+	FONT-WEIGHT: normal; FONT-SIZE: xx-small; COLOR: #333333; FONT-FAMILY: tahoma; TEXT-DECORATION: none
+}
+.leftnav:active {
+	COLOR: #ffffff; TEXT-DECORATION: underline
+}
+.leftnav:hover {
+	COLOR: #ffffff; TEXT-DECORATION: underline
+}
+.leftnav:visited {
+	COLOR: #333333; TEXT-DECORATION: none
+}
+.leftnav:hover {
+	COLOR: #ffffff; TEXT-DECORATION: underline
+}
+.leftnav-nolink {
+	FONT-WEIGHT: bold; FONT-SIZE: xx-small; COLOR: #333333; FONT-FAMILY: tahoma
+}
+.footer {
+	FONT-SIZE: xx-small; COLOR: #333333; FONT-FAMILY: tahoma; TEXT-DECORATION: none
+}
+.footer:active {
+	COLOR: #333333; TEXT-DECORATION: underline
+}
+.footer:hover {
+	COLOR: #333333; TEXT-DECORATION: underline
+}
+.footer:visited {
+	COLOR: #333333; TEXT-DECORATION: none
+}
+.footer:hover {
+	COLOR: #333333; TEXT-DECORATION: underline
+}
+.leftnavBig {
+	FONT-WEIGHT: bold; FONT-SIZE: xx-small; COLOR: #333333; FONT-FAMILY: tahoma; TEXT-DECORATION: underline
+}
+
+.results {
+	FONT-SIZE: xx-small; FONT-FAMILY: tahoma
+}

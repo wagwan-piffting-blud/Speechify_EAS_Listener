@@ -1,0 +1,18 @@
+<!-- A DTD for SpeechWorks XML error mapping files -->
+<!-- Copyright (c) 2001-2003 SpeechWorks International, Inc. -->
+<!-- All Rights Reserved -->
+
+<!ENTITY % critical '1'>
+<!ENTITY % severe   '2'>
+<!ENTITY % warning  '3'>
+<!ENTITY % info     '4'>
+<!ENTITY % disabled '5'>
+
+<!ELEMENT ErrorMessages (error)* >
+<!ATTLIST ErrorMessages version NMTOKEN #FIXED '1.0.0' >
+<!ATTLIST ErrorMessages moduleName CDATA #REQUIRED >
+<!ELEMENT error (#PCDATA | value-of)* >
+<!ATTLIST error num NMTOKEN #REQUIRED >
+<!ATTLIST error severity (%critical;|%severe;|%warning;|%info;|%disabled;) #REQUIRED >
+<!ELEMENT value-of EMPTY >
+<!ATTLIST value-of select CDATA #REQUIRED >

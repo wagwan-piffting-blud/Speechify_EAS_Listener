@@ -1,0 +1,334 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>  <!-- XML version -->
+<?xml-stylesheet type="text/xsl" href="SWIttsConfig.xsl"?>
+
+<!-- Speechify configuration file -->
+<!-- Copyright (c) 2001-2003 SpeechWorks International, Inc. -->
+<!-- All Rights Reserved -->
+
+<!-- Define the structure for the XML -->
+
+<!DOCTYPE SWIttsConfig PUBLIC "-//SpeechWorks//DTD SPEECHIFY CONFIG 1.0//EN"
+                       "SWIttsConfig.dtd">
+
+<!-- *************** CONFIG PARAMETERS ************* -->
+
+<SWIttsConfig version="1.0.0">
+<lang name="Default">
+
+  <!-- *** ENVIRONMENT VARIABLE OVERRIDES *** -->
+
+  <!-- <param name="SWITTSSDK">
+     <value> </value>
+  </param> -->
+
+  <!-- <param name="TMPDIR">
+     <value> </value>
+  </param> -->
+
+  <!-- <param name="USER">
+     <value> </value>
+  </param> -->
+
+
+  <!-- *** SERVER PARAMETERS *** -->
+
+  <param name="tts.server.port">
+     <value> 5555 </value>
+  </param>
+
+  <param name="tts.server.numPorts">
+     <value> 100 </value>
+  </param>
+
+  <param name="tts.server.binDir">
+     <value> ${xml:base}/../bin </value>
+  </param>
+
+  <param name="tts.server.licensingMode">
+     <value> default </value>
+     <!-- <value> explicit </value> -->
+  </param>
+
+  <param name="tts.server.licenseServerList">
+    <namedValue name="1"> 27000@localhost </namedValue>
+    <!-- <namedValue name="2"> 27000@myserver.mycompany.com </namedValue> -->
+  </param>
+
+  <!-- <param name="tts.server.networkInterface">
+    <value> 127.0.0.1 </value>
+  </param> -->
+
+  <param name="tts.server.bindReuseAddr">
+    <value> false </value>
+  </param>
+
+  <param name="tts.server.produceCoreFiles">
+    <value> false </value>
+  </param>
+
+
+  <!-- *** THREAD STACK SIZE *** -->
+
+  <param name="tts.trd.threadStackSize">
+     <value> 0 </value>
+  </param>
+
+
+  <!-- *** VOICE PARAMETERS *** -->
+
+  <param name="tts.voice.dir">
+     <value> ${xml:base}/.. </value>
+  </param>
+
+  <param name="tts.voice.name">
+     <value> tom </value> <!-- can be one of tom, jill, felix, javier, paulina; language folder voice data is stored in must match below -->
+  </param>
+
+  <param name="tts.voice.format">
+     <value> 8 </value>
+     <!-- <value> 16 </value> -->
+  </param>
+
+  <param name="tts.voice.language">
+     <value> en-US </value> <!-- can be one of en-US, es-MX, or fr-CA, case sensitive -->
+  </param>
+
+  <param name="tts.voice.config">
+    <value>
+      ${tts.voice.dir}/${tts.voice.language}/${tts.voice.name}/${tts.voice.name}.vcf
+    </value>
+  </param>
+
+  <!-- *** DEFAULTS FOR SWITTS API PARAMETERS *** -->
+
+  <param name="tts.network.timeout">
+     <value> 60 </value>
+  </param>
+
+  <param name="tts.audio.packetsize">
+     <value> 4096 </value>
+  </param>
+
+  <param name="tts.audioformat.mimetype.8kHz">
+     <value> audio/basic </value>
+  </param>
+
+  <param name="tts.audioformat.mimetype.16kHz">
+     <value> audio/L16;rate=16000 </value>
+  </param>
+
+  <param name="tts.marks.phoneme">
+     <value> false </value>
+  </param>
+
+  <param name="tts.marks.word">
+     <value> false </value>
+  </param>
+
+  <param name="tts.audio.volume">
+     <value> 100 </value>
+  </param>
+
+  <param name="tts.audio.rate">
+     <value> 100 </value>
+  </param>
+
+
+  <!-- *** DEFAULTS FOR SWITTS API ARGUMENTS *** -->
+
+  <param name="tts.textformat.mimetype">
+     <value> text/plain;charset=ISO-8859-1 </value>
+  </param>
+
+
+  <!-- *** ENGINE PARAMETERS *** -->
+
+  <param name="tts.engine.speechDBSegmentSizeMB">
+     <value> 87 </value>
+  </param>
+
+  <param name="tts.engine.dictionaryDefaultPriorityBase">
+     <value> 10000 </value>
+  </param>
+
+  <!-- <protectedParam name="tts.engine.maxAudioRate" password="enterPassword">
+     <value> 2 </value>
+  </protectedParam> -->
+
+
+  <!-- *** TEXT PREPROCESSOR PARAMETERS *** -->
+
+  <param name="tts.preprocessor.map128ToEuroInISO8859-1">
+     <value> true </value>
+  </param>
+
+
+  <!-- *** W3C SSML PARAMETERS *** -->
+
+  <param name="tts.ssml.doStrictValidation">
+     <value> true </value>
+  </param>
+
+  <param name="tts.ssml.failOnAudioFetchError">
+     <value> false </value>
+  </param>
+
+
+  <!-- *** INTERNET FETCH CACHE PARAMETERS *** -->
+
+  <param name="tts.cache.dir">
+     <value> ${TMPDIR}/cache_${tts.voice.name}_${tts.voice.format}_${USER} </value>
+  </param>
+
+  <param name="tts.cache.totalSizeMB">
+     <value> 200 </value>
+  </param>
+
+  <param name="tts.cache.entryMaxSizeMB">
+     <value> 20 </value>
+  </param>
+
+  <param name="tts.cache.entryExpTimeSec">
+     <value> 3600 </value>
+  </param>
+
+  <param name="tts.cache.unlockEntriesAtStartup">
+     <value> true </value>
+  </param>
+
+  <param name="tts.cache.lowWatermarkMB">
+     <value> 180 </value>
+  </param>
+
+
+  <!-- *** INTERNET FETCH PARAMETERS *** -->
+
+  <param name="tts.inet.proxyServer">
+     <value> </value>
+  </param>
+
+  <param name="tts.inet.proxyPort">
+     <value> 1234 </value>
+  </param>
+
+  <param name="tts.inet.userAgent">
+     <value> Speechify/3.0 </value>
+  </param>
+
+  <param name="tts.inet.acceptCookies">
+     <value> true </value>
+  </param>
+
+
+  <!-- *** INTERNET FETCH EXTENSION MAPPING RULES *** -->
+
+  <param name="tts.inet.extensionRules">
+    <namedValue name=".alaw"> audio/x-alaw-basic </namedValue>
+    <namedValue name=".ulaw"> audio/basic </namedValue>
+    <namedValue name=".wav"> audio/x-wav </namedValue>
+    <namedValue name=".L16"> audio/L16;rate=8000 </namedValue>
+    <namedValue name=".txt"> text/plain </namedValue>
+    <namedValue name=".xml"> text/xml </namedValue>
+    <namedValue name=".ssml"> application/synthesis+ssml </namedValue>
+  </param>
+
+
+  <!-- *** DIAGNOSTIC LOGGING *** -->
+
+  <param name="tts.log.diagnostic.toStdout">
+     <value> true </value>
+  </param>
+
+  <param name="tts.log.diagnostic.toSystemLog">
+     <value> true </value>
+  </param>
+
+  <param name="tts.log.diagnostic.file">
+     <value> ${TMPDIR}/SWIttsDiagnosticLog_${tts.voice.name}_${tts.voice.format}_${USER}.txt </value>
+     <!-- <value> </value> -->
+  </param>
+
+  <param name="tts.log.diagnostic.fileMimeType">
+     <value> text/plain;charset=UTF-8 </value>
+     <!-- <value> text/plain;charset=ISO-8859-1 </value> -->
+  </param>
+
+  <param name="tts.log.diagnostic.fileMaxSizeMB">
+     <value> 50 </value>
+  </param>
+
+  <param name="tts.log.diagnostic.fileWriteMode">
+     <value> flushAfterWrite </value>
+  </param>
+
+  <param name="tts.log.diagnostic.reportErrorText">
+     <value> true </value>
+  </param>
+
+  <param name="tts.log.diagnostic.errorMapFile">
+     <value> ${xml:base}/../doc/SpeechifyErrors.en-US.xml </value>
+  </param>
+
+
+  <!-- *** EVENT LOGGING *** -->
+
+  <param name="tts.log.event.file">
+     <value> </value>
+     <!-- <value> ${TMPDIR}/SWIttsEventLog_${tts.voice.name}_${tts.voice.format}_${USER}.txt </value> -->
+  </param>
+
+  <param name="tts.log.event.fileMimeType">
+     <value> text/plain;charset=UTF-8 </value>
+     <!-- <value> text/plain;charset=ISO-8859-1 </value> -->
+  </param>
+
+  <param name="tts.log.event.fileMaxSizeMB">
+     <value> 50 </value>
+  </param>
+
+  <param name="tts.log.event.fileWriteMode">
+     <value> flushAfterWrite </value>
+  </param>
+
+  <param name="tts.log.event.generatedPronunciations">
+     <value> false </value>
+  </param>
+
+
+  <!-- *** LOGGING BLOB DUMPS *** -->
+
+  <param name="tts.log.contentDir">
+     <value> ${TMPDIR}/SWIttsContent_${tts.voice.name}_${tts.voice.format}_${USER} </value>
+  </param>
+
+  <param name="tts.log.contentDirMaxSizeMB">
+     <value> 50 </value>
+  </param>
+
+
+  <!-- *** DIAGNOSTIC TAG ENABLE/DISABLE *** -->
+
+  <param name="tts.log.diagnostic.tags">
+    <namedValue name="1000"> true </namedValue> <!-- LOGGING -->
+    <namedValue name="3000"> true </namedValue> <!-- SERVER -->
+    <namedValue name="4000"> true </namedValue> <!-- USEL -->
+    <namedValue name="5000"> true </namedValue> <!-- CONCAT -->
+    <namedValue name="6000"> true </namedValue> <!-- TTSENGINE -->
+    <namedValue name="6002"> true </namedValue> <!-- TTSENGINE_API -->
+    <namedValue name="7000"> true </namedValue> <!-- SBCACHE_API -->
+    <namedValue name="8000"> true </namedValue> <!-- SBINET_API -->
+  </param>
+
+</lang>
+
+<lang name="en-US">
+
+  <!-- *** ENGINE PARAMETERS *** -->
+
+  <!-- Language specific dictionary -->
+  <!-- <param name="tts.engine.dictionaries">
+    <namedValue name="mypriority"> mydict.xml </namedValue>
+  </param> -->
+</lang>
+
+</SWIttsConfig>

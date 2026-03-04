@@ -1,0 +1,146 @@
+<!-- 
+
+SSML DTD (20031204)
+
+Copyright 1998-2003 W3C (MIT, ERCIM, Keio), All Rights Reserved. 
+
+Permission to use, copy, modify and distribute the SSML DTD and 
+its accompanying documentation for any purpose and without fee is 
+hereby granted in perpetuity, provided that the above copyright 
+notice and this paragraph appear in all copies.  
+
+The copyright holders make no representation about the suitability 
+of the DTD for any purpose. It is provided "as is" without expressed 
+or implied warranty.
+
+Copyright (c) 2002-2004 ScanSoft Inc.
+
+This is a modified version of the DTD from the W3C SSML 04 December
+2003 working draft. It enhances <audio> and <lexicon> element
+attribute support as supported by the ScanSoft, Inc. Speechify
+product, and to permit parsing W3C SSML 02 December 2002 working draft
+documents. The original version is available at
+http://www.w3.org/TR/speech-synthesis/synthesis.dtd
+
+-->
+
+<!ENTITY % duration "CDATA">
+<!ENTITY % integer "CDATA">
+<!ENTITY % uri "CDATA">
+<!ENTITY % audio "#PCDATA | audio ">
+<!ENTITY % structure "paragraph | p | sentence | s">
+<!ENTITY % sentence-elements " break | emphasis | mark | phoneme | prosody | say-as | voice | sub ">
+<!ENTITY % allowed-within-sentence " %audio; | %sentence-elements; ">
+
+<!ELEMENT speak (%allowed-within-sentence; | %structure; | lexicon | metadata | meta)*>
+<!ATTLIST speak
+	version NMTOKEN #REQUIRED
+	xml:lang NMTOKEN #IMPLIED
+	xmlns CDATA #FIXED 'http://www.w3.org/2001/10/synthesis' 
+	xmlns:xsi CDATA #IMPLIED
+	xsi:schemaLocation CDATA #IMPLIED
+        xml:base %uri; #IMPLIED
+>
+
+<!ELEMENT paragraph (%allowed-within-sentence; | sentence | s)*>
+<!ATTLIST paragraph
+	xml:lang NMTOKEN #IMPLIED
+>
+
+<!ELEMENT sentence (%allowed-within-sentence;)*>
+<!ATTLIST sentence
+	xml:lang NMTOKEN #IMPLIED
+>
+
+<!ELEMENT p (%allowed-within-sentence; | sentence | s)*>
+<!ATTLIST p
+	xml:lang NMTOKEN #IMPLIED
+>
+
+<!ELEMENT s (%allowed-within-sentence;)*>
+<!ATTLIST s
+	xml:lang NMTOKEN #IMPLIED
+>
+
+<!ELEMENT voice (%allowed-within-sentence; | %structure;)*>
+<!ATTLIST voice
+	xml:lang NMTOKEN #IMPLIED
+	gender (male | female | neutral) #IMPLIED
+	age %integer; #IMPLIED
+	variant %integer; #IMPLIED
+	name CDATA #IMPLIED
+>
+<!ELEMENT prosody (%allowed-within-sentence; | %structure;)*>
+<!ATTLIST prosody
+	pitch CDATA #IMPLIED
+	contour CDATA #IMPLIED
+	range CDATA #IMPLIED
+	rate CDATA #IMPLIED
+	duration %duration; #IMPLIED
+	volume CDATA #IMPLIED
+>
+
+<!-- SWI enhancement: supports the VoiceXML 2.0 working draft
+     24 April 2002 <audio> attributes for fetch control -->
+
+<!ELEMENT audio (%allowed-within-sentence; | %structure; | desc)*>
+<!ATTLIST audio
+	src %uri; #REQUIRED
+	fetchhint (prefetch | safe) #IMPLIED
+	fetchtimeout %duration; #IMPLIED
+	maxage %integer; #IMPLIED
+	maxstale %integer; #IMPLIED
+>
+
+<!ELEMENT desc (#PCDATA)>
+<!ATTLIST desc
+	xml:lang NMTOKEN #IMPLIED
+>
+
+<!ELEMENT emphasis (%allowed-within-sentence;)*>
+<!ATTLIST emphasis
+	level (strong | moderate | none | reduced) "moderate"
+>
+
+<!ELEMENT say-as (#PCDATA)>
+<!ATTLIST say-as
+	interpret-as NMTOKEN #REQUIRED
+	format NMTOKEN #IMPLIED
+	detail NMTOKEN #IMPLIED
+>
+<!ELEMENT sub (#PCDATA)>
+<!ATTLIST sub
+	alias CDATA #REQUIRED
+>
+<!ELEMENT phoneme (#PCDATA)>
+<!ATTLIST phoneme
+	ph CDATA #REQUIRED
+	alphabet CDATA #IMPLIED
+>
+<!ELEMENT break EMPTY>
+<!ATTLIST break
+	time CDATA #IMPLIED
+	strength  (none | x-weak | weak  | medium | strong | x-strong) "medium"
+>
+<!ELEMENT mark EMPTY>
+<!ATTLIST mark
+	name CDATA #REQUIRED
+>
+
+<!-- SWI enhancement: supports a priority attribute -->
+
+<!ELEMENT lexicon EMPTY>
+<!ATTLIST lexicon
+    uri %uri; #REQUIRED
+    type CDATA #IMPLIED
+    priority %integer; #IMPLIED
+>
+
+<!ELEMENT metadata ANY>
+
+<!ELEMENT meta EMPTY>
+<!ATTLIST meta
+	name NMTOKEN #IMPLIED
+	content CDATA #REQUIRED
+	http-equiv NMTOKEN #IMPLIED
+>

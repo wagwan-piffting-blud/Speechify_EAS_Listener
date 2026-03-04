@@ -1,0 +1,140 @@
+<!-- A DTD for Speechify configuration files -->
+<!-- Copyright (c) 2001-2003 SpeechWorks International, Inc. -->
+<!-- All Rights Reserved -->
+
+<!ENTITY % lang_id '
+  Default | 
+  cn-HK   |
+  ce-HK   |
+  de-DE   |
+  en-AU   |
+  en-GB   |
+  en-SG   |
+  en-US   | 
+  es-ES   |
+  es-MX   |
+  es-US   |
+  fr-CA   |
+  fr-FR   |
+  it-IT   |
+  ja-JP   |
+  ko-KR   |
+  me-TW   |
+  nl-NL   |
+  pt-BR   |
+  zh-TW
+'>
+
+<!ENTITY % env_var_id      '
+  SWITTSSDK                       |
+  TMPDIR                          |
+  USER                            
+'>
+
+<!ENTITY % server_param_id '
+  tts.server.port                 |
+  tts.server.numPorts             |
+  tts.server.binDir               |
+  tts.server.licensingMode        |
+  tts.server.licenseServerList    |
+  tts.server.networkInterface     |
+  tts.server.produceCoreFiles     |
+  tts.server.bindReuseAddr        
+'>
+
+<!ENTITY % voice_param_id '
+  tts.voice.dir                   |
+  tts.voice.name                  |
+  tts.voice.format                |
+  tts.voice.language              |
+  tts.voice.config           
+'>
+
+<!ENTITY % api_param_id '
+  tts.audio.packetsize          |
+  tts.network.timeout             |
+  tts.audioformat.mimetype.8kHz   |
+  tts.audioformat.mimetype.16kHz  |
+  tts.marks.phoneme               |
+  tts.marks.word                  |
+  tts.audio.volume                |
+  tts.audio.rate                  |
+  tts.textformat.mimetype         
+'>
+
+<!ENTITY % preprocessor_param_id '
+  tts.preprocessor.map128ToEuroInISO8859-1
+'>
+
+<!ENTITY % ssml_param_id '
+  tts.ssml.doStrictValidation     |
+  tts.ssml.failOnAudioFetchError  
+'>
+
+<!ENTITY % cache_param_id '
+  tts.cache.dir                       |
+  tts.cache.totalSizeMB               |
+  tts.cache.entryMaxSizeMB            |
+  tts.cache.entryExpTimeSec           |
+  tts.cache.unlockEntriesAtStartup    |
+  tts.cache.lowWatermarkMB            
+'>
+
+<!ENTITY % inet_param_id '
+  tts.inet.proxyServer                |
+  tts.inet.proxyPort                  |
+  tts.inet.userAgent                  |
+  tts.inet.acceptCookies              |
+  tts.inet.extensionRules
+'>
+
+<!ENTITY % log_param_id '
+  tts.log.diagnostic.toStdout              |
+  tts.log.diagnostic.toSystemLog           |
+  tts.log.diagnostic.file                  |
+  tts.log.diagnostic.fileMimeType          |
+  tts.log.diagnostic.fileMaxSizeMB         |
+  tts.log.diagnostic.fileWriteMode         |
+  tts.log.diagnostic.reportErrorText       |
+  tts.log.diagnostic.errorMapFile          |
+  tts.log.diagnostic.tags                  |
+  tts.log.event.file                       |
+  tts.log.event.fileMimeType               |
+  tts.log.event.fileMaxSizeMB              |
+  tts.log.event.fileWriteMode              |
+  tts.log.event.generatedPronunciations    |
+  tts.log.contentDir                       |
+  tts.log.contentDirMaxSizeMB              
+'>
+
+<!ENTITY % misc_param_id '
+  tts.trd.threadStackSize
+'>
+
+<!ENTITY % engine_param_id '
+  tts.engine.dictionaries                  |
+  tts.engine.dictionaryDefaultPriorityBase |
+  tts.engine.speechDBSegmentSizeMB         
+'>
+
+<!ENTITY % protected_param_id '
+  tts.engine.maxAudioRate                  |
+  tts.engine.disableAudio                  |
+  tts.engine.allowLoggingDetails
+'>
+
+
+<!ENTITY % param_id '(%env_var_id; | %server_param_id; | %voice_param_id; | %api_param_id; | %preprocessor_param_id; | %ssml_param_id; | %cache_param_id; | %inet_param_id; | %log_param_id; | %misc_param_id; | %engine_param_id; )'>
+
+<!ELEMENT SWIttsConfig (lang)+ >
+<!ATTLIST SWIttsConfig version NMTOKEN #REQUIRED >
+<!ELEMENT lang (param|protectedParam)* >
+<!ATTLIST lang name (%lang_id;) #REQUIRED >
+<!ELEMENT param (value|namedValue)+ >
+<!ATTLIST param name %param_id; #REQUIRED >
+<!ELEMENT protectedParam (value|namedValue)+ >
+<!ATTLIST protectedParam name (%protected_param_id;) #REQUIRED >
+<!ATTLIST protectedParam password NMTOKEN #REQUIRED >
+<!ELEMENT value (#PCDATA) >
+<!ELEMENT namedValue (#PCDATA) >
+<!ATTLIST namedValue name CDATA #REQUIRED >

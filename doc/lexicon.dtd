@@ -1,0 +1,38 @@
+<!-- A DTD for Speechify and OpenSpeech Recognizer lexicon files -->
+<!-- Copyright (c) 2002-2003 SpeechWorks International, Inc. -->
+<!-- All Rights Reserved -->
+
+<!ENTITY % alphabetChoices "(OSR | SWItts | text)">
+<!ENTITY % alphabetChoicesDefault "'OSR'">
+<!ENTITY % partOfSpeechChoicesDefault "'unknown'">
+<!ENTITY % partOfSpeechChoices 
+  "(
+    unknown      |
+    noun         |
+    verb         |
+    adjective    |
+    adverb       |
+    pronoun      |
+    preposition  |
+    conjunction  |
+    interjection 
+  )"
+>
+<!ENTITY % typeChoices "(root | main | abbreviation | mainext)">
+<!ENTITY % typeChoicesDefault "'main'">
+
+<!ELEMENT lexicon (entry+)>
+<!ATTLIST lexicon xml:lang NMTOKEN #REQUIRED>
+<!ATTLIST lexicon alphabet %alphabetChoices; %alphabetChoicesDefault;>
+<!ATTLIST lexicon type %typeChoices; %typeChoicesDefault;>
+
+<!ELEMENT entry (definition+)>
+<!ATTLIST entry key CDATA #REQUIRED>
+<!ATTLIST entry xml:lang NMTOKEN #IMPLIED>
+<!ATTLIST entry alphabet %alphabetChoices; #IMPLIED>
+
+<!ELEMENT definition EMPTY>
+<!ATTLIST definition value CDATA #REQUIRED>
+<!ATTLIST definition xml:lang NMTOKEN #IMPLIED>
+<!ATTLIST definition alphabet %alphabetChoices; #IMPLIED>
+<!ATTLIST definition part %partOfSpeechChoices; %partOfSpeechChoicesDefault;>

@@ -1,0 +1,115 @@
+\!HEADER ENTRIES
+<eom>,. End of message.
+[, 
+], 
+{, 
+}, 
+=, 
+>, 
+<, 
+(, 
+), 
+Apr,April 
+Aug,August 
+Date:,Date, 
+Dec,December 
+eom,. End of message.
+es,E S 
+Feb,February 
+Fri,Friday 
+From:,From 
+FW:,forwarded, 
+FW:RE,forwarded reply, 
+Jan,January 
+Jun,June 
+Jul,July 
+Mar*,March 
+May*,May 
+Mon,Monday 
+Nov,November 
+Oct,October 
+RE:,reply, 
+RE:FW,reply to a forward message, 
+RE:RE,reply to a reply, 
+Sat*,Saturday
+Sep,September 
+Sept,September
+Subject:,Subject, 
+Sun*,Sunday 
+Thu,Thursday
+Thur,Thursday
+Thurs,Thursday
+Tu,Tuesday    
+Tue,Tuesday  
+uk,U K
+Wed*,Wednesday
+
+\!MIME ENTRIES
+
+######## Speechify notifications ########
+!APPLICATION_FILE_NOTIFY!*,There's an application attached to your message. 
+!AUDIO_FILE_NOTIFY!*,There's an audio file attached to your message. 
+!IMAGE_FILE_NOTIFY!*,There's an image file attached to your message. 
+!VIDEO_FILE_NOTIFY!*,There's a video file attached to your message. 
+!TEXT_FILE_NOTIFY!*,There's a text file attached to your message. It's called
+
+######## Generic ########
+.aiff, dot A I F F.
+.au, dot A U.
+.avi, dot A V I.
+.dat, dot dat.
+.doc, dot doc.
+.gif, dot gif.
+.hml, dot H M L.
+.html, dot H T M L.
+.jpeg, dot J peg.
+.jpg, dot J peg.
+.mpeg, dot M peg.
+.mpg, dot M peg.
+.msg, dot M S G.
+.txt, dot text.
+.ul, dot U L.
+.wav, dot wav.
+.xls, dot X L S.
+
+\!BODY ENTRIES
+-----Original,There's another e-mail embedded in your message. Here it is.
+From:,It's from 
+Message-----, 
+CC:,The message was copied to 
+[,,
+],,
+mailto:,e-mail address,
+
+\!ADDRESS ENTRIES
+email,E-mail address, 
+e-mail,E-mail address, 
+fax,Fax number, 
+http,Find us on the web at 
+pgr,Pager number, 
+tel,Telephone number, 
+ph,Telephone number,
+
+\!GLOBAL ENTRIES
+
+######## Speechify notifications ########
+!END_MSG_NOTIFY!*,That's the end of the message.
+!END_OF_INDENT_NOTIFY!*,That's the end of the section that was indented. 
+!INDENT_NOTIFY!*,This next section of text is indented. 
+!OCTAL_DATA_NOTIFY!*,I'll have to skip the next section. It's octal data.
+!UUENCODED_DATA_NOTIFY!*,I'll have to skip the next section. It's U U encoded data.
+
+######## Generic expansions ########
+:-), ha ha.
+;-), wink.
+:-(, boo hoo.
+:), ha ha.
+;), wink.
+:(, boo hoo.
+ASAP,as soon as possible 
+BTW,by the way 
+FAO,for the attention of
+FYI,for your information, 
+IMHO,in my humble opinion 
+IMO,in my opinion 
+WRT,with regard to 

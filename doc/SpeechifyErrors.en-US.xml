@@ -1,0 +1,1776 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>  <!-- XML version -->
+<?xml-stylesheet type="text/xsl" href="SpeechifyErrors.xsl"?>
+
+<!-- Speechify configuration file -->
+<!-- Copyright (c) 2001-2003 SpeechWorks International, Inc. -->
+<!-- All Rights Reserved -->
+
+<!-- Define the structure for the XML -->
+<!DOCTYPE ErrorMessages PUBLIC "-//SpeechWorks//DTD ERRORS 1.0//EN"
+                        "ErrorMessages.dtd">
+
+<ErrorMessages moduleName="swi:Speechify" version="1.0.0">
+    <!-- Speechify client library errors -->
+    <error num="1" severity="3">Speechify client return code: The TTS
+    client is not initialized </error>
+    <error num="2" severity="3">Speechify client return code: One of
+    the parameters passed to the function was invalid </error>
+    <error num="3" severity="3">Speechify client return code: The
+    port handle passed was not a valid handle </error>
+    <error num="4" severity="2">Speechify client return code: The
+    engine on this port is no longer available </error>
+    <error num="5" severity="2">Speechify client return code: An
+    internal error occurred in the TTS engine on the server </error>
+    <error num="6" severity="1">Speechify client return code: An error
+    in the client/server communication occurred</error>
+    <error num="7" severity="1">Speechify client return code: WinSock
+    initialization failed </error>
+    <error num="8" severity="1">Speechify client return code: A
+    sockets error occurred </error>
+    <error num="9" severity="2">Speechify client return code: The
+    client could not connect to the server </error>
+    <error num="10" severity="1">Speechify client return code: An
+    attempt to allocate memory failed </error>
+    <error num="11" severity="1">Speechify client return code: An
+    attempt to create a new thread failed </error>
+    <error num="12" severity="1">Speechify client return code: An
+    attempt to create a new mutex failed </error>
+    <error num="13" severity="1">Speechify client return code: An
+    error occurred on the server </error>
+    <error num="14" severity="1">Speechify client return code: Could
+    not resolve the host name or IP address
+    </error>
+    <error num="15" severity="1">Speechify client return code: A crash
+    occurred within the client library. A crash log named ALTmon.dmp
+    might have been generated in the Speechify SDK directory. Please
+    send it to Speechify technical support. This is an unrecoverable
+    error and you should close the application
+    </error>
+    <error num="16" severity="3">Speechify client return code: This
+    API can only be called if the TTS port is idle
+    </error>
+    <error num="17" severity="3">Speechify client return code: A
+    command could not be executed because the port is shutting down
+    </error>
+    <error num="18" severity="3">Speechify client return code:
+    SWIttsClosePort() was called when the port was already being closed
+    </error>
+    <error num="19" severity="3">Speechify client return code: The
+    port is already closed. You cannot invoke SWIttsClosePort() on a
+    port that has been closed
+    </error>
+    <error num="20" severity="3">Speechify client return code: This
+    API cannot be executed because another API is in progress on this
+    port on another thread
+    </error>
+    <error num="21" severity="1">Speechify client return code: An
+    internal error. Notify ScanSoft technical support if you see
+    this result code.
+    </error>
+    <error num="22" severity="3">Speechify client return code:
+    SWIttsStop() was called when the port already in the process of stopping
+    </error>
+    <error num="23" severity="3">Speechify client return code:
+    SWIttsStop() was called when the port was not speaking
+    </error>
+    <error num="24" severity="3">Speechify client return code:
+    SWIttsAddDictionaryEntry() or SWIttsDeleteDictionaryEntry() was
+    called with one or more invalid entries
+    </error>
+    <error num="25" severity="3">Speechify client return code:
+    SWIttsSetParameters() was called with at least one read-only parameter
+    </error>
+    <error num="26" severity="3">Speechify client return code: character
+    set is invalid or unsupported
+    </error>
+    <error num="27" severity="3">Speechify client return code: could not
+    parse SSML text
+    </error>
+    <error num="28" severity="3">Speechify client return code: URI
+    fetch failed </error>
+    <error num="29" severity="3">Speechify client return code: URI
+    fetch failed, URI not found </error>
+    <error num="30" severity="3">Speechify client return code: URI
+    fetch error, timeout during fetch </error>
+    <error num="31" severity="3">Speechify client return code:
+    Dictionary operation failed, invalid dictionary type </error>
+    <error num="32" severity="3">Speechify client return code:
+    Dictionary operation failed, dictionary is active </error>
+    <error num="33" severity="3">Speechify client return code:
+    Dictionary operation failed, dictionary is not loaded </error>
+    <error num="34" severity="3">Speechify client return code:
+    Dictionary load failed, dictionary is already loaded </error>
+    <error num="35" severity="3">Speechify client return code:
+    Dictionary activate failed, another dictionary is already active
+    with the specified priority </error>
+    <error num="36" severity="3">Speechify client return code:
+    Dicationary activate failed, invalid priority </error>
+    <error num="37" severity="3">Speechify client return code:
+    Dictionary load failed, dictionary parse error </error>
+    <error num="38" severity="3">Speechify client return code: API
+    failed, no license available </error>
+    <error num="39" severity="3">Speechify client return code:
+    Resource allocate failed, license already allocated </error>
+    <error num="40" severity="3">Speechify client return code:
+    Resource free failed, license already freed </error>
+    <error num="41" severity="3">Speechify client return code: API
+    failed, operation is not supported by the current version of
+    Speechify </error>
+    <error num="42" severity="3">Speechify client return code:
+    SWIttsInit failed, already initialized </error>
+    <error num="43" severity="3">Speechify client return code: API
+    failed, invalid MIME media type </error>
+
+    <error num="100" severity="1">Speechify client: Internal logic
+    error: unknown state </error>
+    <error num="101" severity="1">Speechify client: Internal logic
+    error: unexpected state </error>
+    <error num="102" severity="1">Speechify client: Memory allocation
+    failure </error>
+    <error num="103" severity="1">Speechify client: OS failure </error>
+    <error num="104" severity="1">Speechify client: Fatal TTS engine
+    error detected </error>
+
+    <error num="105" severity="2">Speechify client: Transmission error
+    detected </error>
+    <error num="106" severity="2">Speechify client: Socket function
+    failed </error>
+    <error num="107" severity="2">Speechify client: Connection lost </error>
+    <error num="108" severity="2">Speechify client: Operation timed
+    out </error>
+    <error num="109" severity="2">Speechify client: Dictionary
+    operation completed with errors </error>
+    <error num="110" severity="2">Speechify client: Partial speech
+    generation failure </error>
+    <error num="111" severity="2">Speechify client: SWIttsSpeak:
+    server failed to execute a speak request </error>
+    <error num="112" severity="2">Speechify client: SWIttsStop: server
+    failed to execute a stop request </error>
+    <error num="113" severity="2">Speechify client: SWIttsOpen: cannot
+    open new port on server </error>
+
+    <error num="114" severity="3">Speechify client: SWIttsClose:
+    server could not close port </error>
+    <error num="115" severity="3">Speechify client: SWIttsStop:
+    attempting to stop when port is not speaking </error>
+    <error num="116" severity="3">Speechify client: SWIttsStop: stop
+    requested when already stopping </error>
+    <error num="117" severity="3">Speechify client: Aborting an
+    in-progress operation </error>
+    <error num="118" severity="3">Speechify client: Asynchronous API
+    is used illegally </error>
+    <error num="119" severity="3">Speechify client: SWIttsInit: called
+    more than once per process. API call ignored. </error>
+
+    <error num="120" severity="1">Speechify client: Thread or mutex
+    failure </error>
+    <error num="121" severity="2">Speechify client: Socket operation
+    failed </error>
+    <error num="122" severity="2">Speechify client: SWIttsOpenPortEx:
+    bad parameter list </error>
+    <error num="123" severity="2">Speechify client: server cannot
+    support this version of the client library </error>
+    
+    <!-- Main server errors -->
+    <error num="1000" severity="2">Speechify server: Failed to
+    recieve a request </error>
+    <error num="1001" severity="2">Speechify server: Lost the client
+    connection </error>
+    <error num="1002" severity="2">Speechify server: Socket error
+    when waiting for connections </error>
+    <error num="1003" severity="1">Speechify server: Could not bind
+    to a socket to wait for connections </error>
+    <error num="1004" severity="2">Speechify server: Client sent
+    unexpected messages after a close port message </error>
+    <error num="1005" severity="2">Speechify server: TCP/IP socket
+    failure </error>
+    <error num="1006" severity="3">Speechify server: Client
+    connection rejected, maximum port count exceeded </error>
+    <error num="1007" severity="3">Speechify server: Client
+    connection rejected, unsupported protocol version </error>
+    <error num="1008" severity="2">Speechify server: Client
+    connection rejected, did not start with an open message </error>
+    <error num="1009" severity="2">Speechify server: Client
+    requested an unknown operation </error>
+    <error num="1010" severity="3">Speechify server: Could not
+    unbind from the socket waiting for connections </error>
+    <error num="1011" severity="4">Speechify server: Server shutdown
+    initiated </error>
+    <error num="1012" severity="4">Speechify server: Server shutdown
+    in progress, waiting for ports to shut down </error>
+    <error num="1013" severity="2">Speechify server: Lost the client
+    connection, no heartbeat or data for two timeout periods </error>
+    <error num="1014" severity="1">Speechify server: Internal error,
+    failed to register the Win32 service control message handler </error>
+    <error num="1015" severity="1">Speechify server: Failed to run as
+    a Win32 service </error>
+    <error num="1016" severity="1">Speechify server: Internal error,
+    failed to set the Win32 service status </error>
+    <error num="1017" severity="1">Speechify server: Cannot mix
+    Speechify 2.x and current server options </error>
+    <error num="1018" severity="1">Speechify server: Cannot mix
+    Speechify 2.x and current server options </error>
+    <error num="1019" severity="3">Speechify server: Speechify 2.x
+    option ignored, no longer meaningful </error>
+    <error num="1020" severity="1">Speechify server: Unsupported
+    option specified </error>
+    <error num="1021" severity="1">Speechify server: SWITTSSDK
+    environment must be set </error>
+    <error num="1022" severity="1">Speechify server: SWITTSSDK
+    environment must be non-empty </error>
+    <error num="1023" severity="1">Speechify server: Server
+    configuration initialization failed </error>
+    <error num="1024" severity="1">Speechify server: Invalid server
+    port configured </error>
+    <error num="1025" severity="1">Speechify server: Invalid server
+    port count configured </error>
+    <error num="1026" severity="1">Speechify server: Server
+    configuration shutdown failed </error>
+    <error num="1027" severity="2">Speechify server: Unknown command
+    line argument </error>
+    <error num="1028" severity="2">Speechify server: Command line
+    option requires an argument </error>
+    <error num="1029" severity="2">Speechify server: Internal error,
+    unexpected failure during port shutdown </error>
+    <error num="1030" severity="4">Speechify server: Server started,
+    waiting for connections </error>
+    <error num="1031" severity="2">Speechify server: Server shutdown
+    proceeding, assuming open ports are hung </error>
+    <error num="1032" severity="4">Speechify server: Server shutdown
+    in progress, waiting for ongoing speak request to end </error>
+    <error num="1033" severity="4">Speechify server: waiting for the
+    port to close </error>
+    <error num="1034" severity="4">Speechify server: waiting for stop
+    to complete before closing the port </error>
+    <error num="1035" severity="4">Speechify server: waiting to close
+    the port </error>
+    <error num="1036" severity="4">Speechify server: waiting for the
+    port to close </error>
+    <error num="1037" severity="4">Speechify server: startup delayed,
+    waiting for the server TCP/IP port to become available </error>
+
+    <!-- Server config errors -->
+    <error num="2000" severity="1">Speechify server: Xerces
+    initialization failed </error>
+    <error num="2001" severity="1">Speechify server: Invalid
+    configuration file path, empty string </error>
+    <error num="2002" severity="1">Speechify server: Invalid
+    configuration file path, no extension </error>
+    <error num="2003" severity="1">Speechify server: Invalid
+    configuration file path, extension not supported </error>
+    <error num="2004" severity="1">Speechify server: Overlay
+    configuration file specifies a configuration parameter that isn't
+    specified in the base configuration file </error>
+    <error num="2005" severity="1">Speechify server: Overlay
+    configuration file specifies a list configuration parameter that isn't
+    specified in the base configuration file </error>
+    <error num="2006" severity="1">Speechify server: Invalid
+    configuration file version number </error>
+    <error num="2007" severity="1">Speechify server: Configuration
+    file parse error, missing name attribute for lang </error>
+    <error num="2008" severity="1">Speechify server: Configuration
+    file parse error, cannot have multiple lang elements referring
+    to the same language </error>
+    <error num="2009" severity="1">Speechify server: Configuration
+    file parse error, missing name attribute for param or
+    protectedParam </error>
+    <error num="2010" severity="1">Speechify server: Configuration
+    file parse error, missing password attribute for protectedParam </error>
+    <error num="2011" severity="1">Speechify server: Configuration
+    file parse error, no value for param or protectedParam </error>
+    <error num="2012" severity="1">Speechify server: Configuration
+    file parse error, missing name for namedValue </error>
+    <error num="2013" severity="3">Speechify server: Configuration
+    file parse warning, duplicate parameter </error>
+    <error num="2014" severity="1">Speechify server: Configuration
+    file parse error, no parameters found </error>
+    <error num="2015" severity="1">Speechify server: Configuration
+    file parse error, voice scm file open failed </error>
+    <error num="2016" severity="1">Speechify server: Configuration
+    file parse error, no parameters found in voice scm file </error>
+    <error num="2017" severity="1">Speechify server: Configuration
+    file parse error, voice CONFIG file open failed </error>
+    <error num="2018" severity="1">Speechify server: Configuration
+    file parse error, invalid voice CONFIG line format </error>
+    <error num="2019" severity="2">Speechify server: Configuration
+    file save error, file open failed </error>
+    <error num="2020" severity="2">Speechify server: Configuration
+    file save error, file write of the header failed </error>
+    <error num="2021" severity="2">Speechify server: Configuration
+    file save error, file write of the data failed </error>
+    <error num="2022" severity="2">Speechify server: Configuration set
+    string failed, invalid argument </error>
+    <error num="2023" severity="2">Speechify server: Configuration set
+    string failed, add mode and the parameter already exists </error>
+    <error num="2024" severity="2">Speechify server: Configuration set
+    string failed, modify mode and the parameter does not exist </error>
+    <error num="2025" severity="2">Speechify server: Configuration set
+    string failed, add/modify mode but both insert and replace failed </error>
+    <error num="2026" severity="2">Speechify server: Configuration set
+    string failed, invalid mode </error>
+    <error num="2027" severity="2">Speechify server: Configuration set
+    wide string failed, invalid argument </error>
+    <error num="2028" severity="2">Speechify server: Configuration get
+    list value failed, invalid argument </error>
+    <error num="2029" severity="2">Speechify server: Configuration get
+    value failed, invalid argument </error>
+    <error num="2030" severity="1">Speechify server: Required
+    configuration parameter is not configured </error>
+    <error num="2031" severity="1">Speechify server: Configuration
+    parameter may not be empty </error>
+    <error num="2032" severity="2">Speechify server: Configuration get
+    list string failed, invalid argument </error>
+    <error num="2033" severity="2">Speechify server: Configuration get
+    string failed, invalid argument </error>
+    <error num="2034" severity="2">Speechify server: Configuration get
+    list wide string failed, invalid argument </error>
+    <error num="2035" severity="2">Speechify server: Configuration get
+    wide string failed, invalid argument </error>
+    <error num="2036" severity="2">Speechify server: Configuration get
+    list path failed, invalid argument </error>
+    <error num="2037" severity="2">Speechify server: Configuration get
+    path failed, invalid argument </error>
+    <error num="2038" severity="2">Speechify server: Configuration get
+    wide path failed, invalid argument </error>
+    <error num="2039" severity="2">Speechify server: Configuration get
+    list URI failed, invalid argument </error>
+    <error num="2040" severity="2">Speechify server: Configuration get
+    URI failed, invalid argument </error>
+    <error num="2041" severity="1">Speechify server: Invalid value for
+    an integer configuration parameter </error>
+    <error num="2042" severity="1">Speechify server: Integer
+    configuration parameter is out-of-range </error>
+    <error num="2043" severity="2">Speechify server: Configuration get
+    list integer failed, invalid argument </error>
+    <error num="2044" severity="2">Speechify server: Configuration get
+    integer failed, invalid argument </error>
+    <error num="2045" severity="1">Speechify server: Invalid value for
+    an unsigned integer configuration parameter </error>
+    <error num="2046" severity="1">Speechify server: Unsigned integer
+    configuration parameter is out-of-range </error>
+    <error num="2047" severity="2">Speechify server: Configuration get
+    list unsigned integer failed, invalid argument </error>
+    <error num="2048" severity="2">Speechify server: Configuration get
+    unsigned integer failed, invalid argument</error>
+    <error num="2049" severity="1">Speechify server: Invalid value for
+    a floating point configuration parameter </error>
+    <error num="2050" severity="2">Speechify server: Configuration get
+    list float failed, invalid argument </error>
+    <error num="2051" severity="2">Speechify server: Configuration get
+    float failed, invalid argument</error>
+    <error num="2052" severity="1">Speechify server: Invalid value for
+    a boolean configuration parameter, use true or false </error>
+    <error num="2053" severity="2">Speechify server: Configuration get
+    list boolean failed, invalid argument </error>
+    <error num="2054" severity="2">Speechify server: Configuration get
+    boolean failed, invalid argument</error>
+    <error num="2055" severity="2">Speechify server: Configuration get
+    list failed, invalid argument </error>
+    <error num="2056" severity="1">Speechify server: List
+    configuration parameter is required </error>
+    <error num="2057" severity="1">Speechify server: List
+    configuration parameter may not be empty </error>
+    <error num="2058" severity="2">Speechify server: Configuration get
+    list as map failed, invalid argument </error>
+    <error num="2059" severity="3">Speechify server: Duplicate
+    configuration file parameter in voice CONFIG file </error>
+    <error num="2060" severity="1">Speechify server: List
+    configuration parameter is required </error>
+    <error num="2061" severity="1">Speechify server: List
+    configuration parameter may not be empty </error>
+    <error num="2062" severity="2">Speechify server: Configuration
+    error, parameter insertion failed </error>
+    <error num="2063" severity="1">Speechify server: Variable not
+    found as a configuration parameter nor as a environment variable </error>
+    <error num="2064" severity="1">Speechify server: XML configuration
+    file parse error </error>
+    <error num="2065" severity="1">Speechify server: Configuration
+    file references an invalid DTD or schema </error>
+    <error num="2066" severity="1">Speechify server: Configuration
+    file parse error, XML configuration file open failed </error>
+    <error num="2067" severity="2">Speechify server: Configuration set
+    map failed, all map values must be a VXIString </error>
+    <error num="2068" severity="1">Speechify server: Configuration
+    file parse error, could not get XML configuration file size </error>
+    <error num="2069" severity="1">Speechify server: Configuration
+    file parse error, XML configuration file read failed </error>
+    <error num="2070" severity="1">Speechify server: Configuration
+    file parse error, corrupt input file </error>
+
+    <!-- Server utility function errors -->
+    <error num="3000" severity="1">Speechify server: Audio conversion
+    library not initialized </error>
+    <error num="3001" severity="1">Speechify server: RIFF library
+    cannot be initialized, incompatible compiler data sizes or formats
+    </error>
+    <error num="3002" severity="2">Speechify server: Empty file name
+    passed for RIFF writer creation </error>
+    <error num="3003" severity="2">Speechify server: RIFF writer
+    create called while a file is already open </error>
+    <error num="3004" severity="2">Speechify server: RIFF writer file
+    open failed </error>
+    <error num="3005" severity="2">Speechify server: RIFF writer does
+    not have an open file </error>
+    <error num="3006" severity="2">Speechify server: RIFF writer chunk
+    open failed due to an invalid chunk ID </error>
+    <error num="3007" severity="2">Speechify server: RIFF writer I/O
+    error, seek to write chunk size failed </error>
+    <error num="3008" severity="2">Speechify server: RIFF writer I/O
+    error, seek after writing chunk size failed </error>
+    <error num="3009" severity="2">Speechify server: RIFF writer I/O
+    error, file write failed </error>
+    <error num="3010" severity="2">Speechify server: Empty file name
+    passed for RIFF reader creation </error>
+    <error num="3011" severity="2">Speechify server: RIFF reader
+    create called while a file is already open </error>
+    <error num="3012" severity="2">Speechify server: RIFF reader file
+    open failed </error>
+    <error num="3013" severity="2">Speechify server: RIFF reader file
+    open failed, not a RIFF file </error>
+    <error num="3014" severity="2">Speechify server: RIFF reader does
+    not have an open file</error>
+    <error num="3015" severity="2">Speechify server: RIFF reader chunk
+    open failed, invalid RIFF chunk header </error>
+    <error num="3016" severity="2">Speechify server: RIFF reader I/O
+    error, seek to the next chunk failed </error>
+    <error num="3017" severity="2">Speechify server: RIFF reader read
+    failed, attempt to read past the end of a chunk </error>
+    <error num="3018" severity="2">Speechify server: RIFF reader I/O
+    error, read failed </error>
+    <error num="3019" severity="2">Speechify server: Invalid argument
+    for RIFF reader read </error>
+    <error num="3020" severity="2">Speechify server: Invalid argument
+    for RIFF writer write bytes </error>
+    <error num="3021" severity="2">Speechify server: Invalid argument
+    for RIFF writer write string </error>
+    <error num="3022" severity="2">Speechify server: RIFF information
+    chunk write failed, failed to get the date </error>
+
+    <!-- Server logging errors -->
+    <error num="4100" severity="1">Speechify server: Out of memory </error>
+    <error num="4101" severity="1">Speechify server: Mutex create failed
+    </error>
+    <error num="4102" severity="1">Speechify server: Mutex lock failed
+    </error>
+    <error num="4103" severity="1">Speechify server: Mutex unlock failed
+    </error>
+    <error num="4104" severity="1">Speechify server: Already initialized
+    </error>
+    <error num="4105" severity="1">Speechify server: Not initialized </error>
+    <error num="4150" severity="1">Speechify server: Invalid system log file
+    format configured </error>
+    <error num="4151" severity="1">Speechify server: System log file open
+    failed </error>
+    <error num="4152" severity="1">Speechify server: Invalid system log file
+    size limit configured </error>
+    <error num="4153" severity="1">Speechify server: Invalid content logging
+    file size limit configured </error>
+    <error num="4154" severity="1">Speechify server: Invalid system log file
+    name configured </error>
+    <error num="4200" severity="2">Speechify server: Internal error in
+    RegisterErrorListener(), NULL callback data </error>
+    <error num="4201" severity="2">Speechify server: Internal error in
+    UnregisterErrorListener(), NULL callback data </error>
+    <error num="4202" severity="2">Speechify server: Internal error in
+    RegisterDiagnosticListener(), NULL callback data </error>
+    <error num="4203" severity="2">Speechify server: Internal error in
+    UnregisterDiagnosticListener(), NULL callback data </error>
+    <error num="4204" severity="2">Speechify server: Internal error in
+    RegisterEventListener(), NULL callback data </error>
+    <error num="4205" severity="2">Speechify server: Internal error in
+    UnregisterEventListener(), NULL callback data </error>
+    <error num="4206" severity="2">Speechify server: Internal error in
+    RegisterContentListener(), NULL callback data </error>
+    <error num="4207" severity="2">Speechify server: Internal error in
+    RegisterContentListener(), NULL callback data </error>
+    <error num="4208" severity="2">Speechify server: Internal error in
+    ParseKeyValue(), invalid argument </error>
+    <error num="4250" severity="2">Speechify server: System log file write
+    failed </error>
+    <error num="4251" severity="2">Speechify server: System log file rollover
+    failed </error>
+    <error num="4252" severity="2">Speechify server: Content logging file open
+    failed </error>
+    <error num="4253" severity="2">Speechify server: Content logging file
+    write failed </error>
+    <error num="4254" severity="2">Speechify server: Invalid argument to API
+    function </error>
+    <error num="4300" severity="3">Speechify server: Tag ID is too large
+    </error>
+    <error num="4301" severity="3">Speechify server: Invalid format string for
+    VXIlog API call, replacements for key names must be %s </error>
+    <error num="4302" severity="3">Speechify server: Invalid format string for
+    VXIlog API call, missing value for a key </error>
+    <error num="4303" severity="3">Speechify server: Invalid format string for
+    VXIlog API call, must be a list of format strings for key/value pairs
+    </error>
+    <error num="4304" severity="3">Speechify server: Internal error, parse
+    failure after key/value insertions </error>
+    <error num="4305" severity="3">Speechify server: Empty module name passed
+    to VXIlog API call </error>
+    <error num="4306" severity="3">Speechify server: Invalid argument to
+    VXIlog::ContentOpen() </error>
+    <error num="4307" severity="3">Speechify server: Invalid argument to
+    VXIlog::ContentClose() </error>
+    <error num="4308" severity="3">Speechify server: Invalid argument to
+    VXIlog::ContentWrite() </error>
+    <error num="4309" severity="3">Speechify server: SBlogCreateResource()
+    requires a non-NULL log interface pointer </error>
+    <error num="4310" severity="3">Speechify server: SBlogDestroyResource()
+    requires a non-NULL log interface pointer </error>
+    <error num="4350" severity="3">Speechify server: XML error text lookup
+    feature disabled because the listener is compiled without defining
+    HAVE_XERCES </error>
+    <error num="4351" severity="3">Speechify server: XML error text lookup
+    feature disabled due to an error in parsing the configured XML error files
+    </error>
+    <error num="4352" severity="3">Speechify server: XML error lookup file
+    parse failed </error>
+    <error num="4353" severity="3">Speechify server: XML parser exception
+    </error>
+    <error num="4354" severity="3">Speechify server: Duplicate error number
+    entry in XML error mapping file </error>
+    <error num="4355" severity="3">Speechify server: XML error text file
+    references an invalid DTD or schema </error>
+    <error num="4900" severity="2">Speechify server: Internal error,
+    compstats clock ended without a matching start </error>
+    <error num="4901" severity="2">Speechify server: Internal error,
+    compstats clock started without ending the previous start </error>
+
+    <!-- Server SSML errors -->
+    <error num="5000" severity="2">Speechify server: Invalid argument
+    to SSML create resource </error>
+    <error num="5002" severity="2">Speechify server: Invalid argument
+    to SSML destroy resource </error>
+    <error num="5003" severity="2">Speechify server: Invalid argument
+    to SSML parse </error>
+    <error num="5004" severity="2">Speechify server: Invalid argument
+    to SSML resolve bookmark </error>
+    <error num="5006" severity="3">Speechify server: Audio MIME
+    content type not supported for audio element </error>
+    <error num="5007" severity="3">Speechify server: Non-audio MIME
+    content type not supported for audio element </error>
+    <error num="5011" severity="3">Speechify server: audio element
+    fetch failed </error>
+    <error num="5012" severity="2">Speechify server: Internal error,
+    no absolute URL returned for an audio element fetch </error>
+    <error num="5013" severity="2">Speechify server: Internal error,
+    no MIME content type returned for an audio element fetch </error>
+    <error num="5014" severity="2">Speechify server: Internal error,
+    no size returned for an audio element fetch </error>
+    <error num="5015" severity="2">Speechify server: Insufficient memory
+    for an audio element fetch </error>
+    <error num="5016" severity="2">Speechify server: Insufficient memory
+    for an audio element fetch </error>
+    <error num="5017" severity="3">Speechify server: Empty audio
+    returned for an audio element fetch </error>
+    <error num="5018" severity="3">Speechify server: Web server
+    returned an incorrect size for an audio element fetch </error>
+    <error num="5019" severity="2">Speechify server: Insufficient
+    memory to shrink an audio element fetch buffer </error>
+    <error num="5020" severity="2">Speechify server: Internal error,
+    could not close an internet fetch stream for an audio element fetch
+    </error>
+    <error num="5021" severity="2">Speechify server: Read during an
+    audio element fetch failed </error>
+    <error num="5023" severity="3">Speechify server: Invalid
+    attribute for a phoneme element </error>
+    <error num="5024" severity="3">Speechify server: Invalid break
+    size attribute value </error>
+    <error num="5025" severity="2">Speechify server: Internal error,
+    Shift-JIS transcoder registration </error>
+    <error num="5026" severity="3">Speechify server: SSML audio
+    element data not found and no fallback text specified </error>
+    <error num="5027" severity="3">Speechify server: Text types not
+    currently supported </error>
+    <error num="5028" severity="3">Speechify server: Invalid value for
+    a prosody element volume attribute </error>
+    <error num="5029" severity="3">Speechify server: Invalid value for
+    a prosody element rate attribute </error>
+    <error num="5030" severity="3">Speechify server: Invalid duration
+    for an audio element attribute </error>
+    <error num="5031" severity="2">Speechify server: SSML internal
+    error, trying to save a mark with an empty name </error>
+    <error num="5032" severity="2">Speechify server: SSML internal
+    error, saving text twice on a single parse </error>
+    <error num="5034" severity="2">Speechify server: SSML internal
+    error, bad audio passed for saving audio in results </error>
+    <error num="5035" severity="2">Speechify server: SSML internal
+    error, invalid escape sequence in bookmark </error>
+    <error num="5036" severity="2">Speechify server: SSML internal
+    error, no audio found for audio bookmark </error>
+    <error num="5037" severity="3">Speechify server: Invalid break
+    value </error>
+    <error num="5038" severity="3">Speechify server: Invalid break
+    units </error>
+    <error num="5039" severity="3">Speechify server: Invalid break
+    size attribute value </error>
+    <error num="5040" severity="2">Speechify server: Internal error,
+    empty source argument for RIFF WAV file parse </error>
+    <error num="5041" severity="3">Speechify server: Invalid RIFF WAV
+    file, missing RIFF chunk </error>
+    <error num="5042" severity="3">Speechify server: Invalid RIFF WAV
+    file, corrupt chunk </error>
+    <error num="5043" severity="3">Speechify server: Invalid RIFF WAV
+    file, corrupt fmt chunk </error>
+    <error num="5044" severity="3">Speechify server: Unsupported RIFF WAV
+    file, only mono audio (single channel) is supported </error>
+    <error num="5045" severity="3">Speechify server: Unsupported RIFF WAV
+    file, only support linear samples sizes that fall on even byte
+    boundaries </error>
+    <error num="5046" severity="3">Speechify server: Invalid RIFF WAV
+    file, mismatched specifications for A-law audio </error>
+    <error num="5047" severity="3">Speechify server: Invalid RIFF WAV
+    file, mismatched specifications for u-law audio </error>
+    <error num="5048" severity="3">Speechify server: Unsupported RIFF WAV
+    file, unsupported sample format </error>
+    <error num="5049" severity="3">Speechify server: Invalid RIFF WAV
+    file, missing fmt chunk </error>
+    <error num="5050" severity="3">Speechify server: Invalid RIFF WAV
+    file, missing audio data chunk </error>
+    <error num="5051" severity="2">Speechify server: Insufficient
+    memory for RIFF WAV audio data storage </error>
+    <error num="5052" severity="3">Speechify server: Unsupported
+    element type ignored </error>
+    <error num="5053" severity="3">Speechify server: Unsupported
+    element attribute ignored </error>
+    <error num="5054" severity="3">Speechify server: Unsupported
+    say-as type, speaking the text as-is </error>
+    <error num="5055" severity="3">Speechify server: Invalid value for
+    an emphasis element level attribute </error>
+    <error num="5056" severity="3">Speechify server: Unsupported value for
+    an emphasis element level attribute, ignoring </error>
+    <error num="5057" severity="3">Speechify server: Phoneme alphabet
+    is not supported, speaking the text instead of the phoneme string </error>
+    <error num="5058" severity="3">Speechify server: Language not
+    supported by the W3C SSML parser, using en-US rules </error>
+    <error num="5059" severity="3">Speechify server: Unsupported value for
+    an audio element fetchhint attribute, ignoring </error>
+    <error num="5060" severity="3">Speechify server: Internal error,
+    unsupported internal time default value </error>
+    <error num="5061" severity="3">Speechify server: Language country
+    code or subtag not supported by the W3C SSML parser, using the
+    base language rules </error>
+    <error num="5062" severity="3">Speechify server: Specified W3C
+    SSML version is not supported, proceeding on a best-effort basis </error>
+    <error num="5063" severity="3">Speechify server: Lexicon elements
+    must occur before all other elements and text contained within the
+    root speak element (except metadata) </error>
+    <error num="5064" severity="3">Speechify server: Metadata elements
+    must occur before all other elements and text contained within the
+    root speak element (except lexicon) </error>
+    <error num="5065" severity="3">Speechify server: Invalid
+    attributes for a say-as element: sub, type, and the interpret-as
+    suite (interpret-as, format, and detail) are mutually exclusive </error>
+    <error num="5066" severity="3">Speechify server: SSML XML parse
+    fatal error </error>
+    <error num="5067" severity="3">Speechify server: SSML XML parse
+    error </error>
+    <error num="5068" severity="3">Speechify server: SSML XML parse
+    warning </error>
+    <error num="5069" severity="3">Speechify server: Invalid value for
+    a break time attribute </error>
+    <error num="5070" severity="3">Speechify server: Invalid value for
+    a lexicon priority attribute </error>
+    <error num="5071" severity="3">Speechify server: Voice language
+    change requested but not supported </error>
+    <error num="5072" severity="3">Speechify server: Voice name
+    change requested but not supported </error>
+    <error num="5073" severity="3">Speechify server: Voice gender
+    change requested but not supported </error>
+    <error num="5074" severity="3">Speechify server: Voice age
+    change requested but not supported </error>
+    <error num="5075" severity="3">Speechify server: SSML document
+    references an invalid DTD or schema </error>
+    <error num="5076" severity="3">Speechify server: SSML document
+    references an invalid lexicon type </error>
+    <error num="5077" severity="3">Speechify server: SSML document
+    say-as date value could not be parsed, speaking as-is </error>
+    <error num="5078" severity="3">Speechify server: SSML document
+    say-as duration value could not be parsed, speaking as-is </error>
+    <error num="5079" severity="3">Speechify server: SSML document
+    say-as duration value does not match the specified format,
+    speaking as-is </error>
+    <error num="5080" severity="3">Speechify server: SSML document
+    pause duration value is out-of-range, adjusted to be within the
+    Speechify supported range </error>
+    <error num="5081" severity="3">Speechify server: SSML document
+    say-as time value could not be parsed, speaking as-is </error>
+    <error num="5082" severity="3">Speechify server: SSML document
+    say-as currency value could not be parsed, speaking as-is </error>
+
+    <!-- Server engine errors -->
+    <error num="6000" severity="1">Speechify server: Invalid argument
+    to SWIttsInitEx( ) </error>
+    <error num="6001" severity="1">Speechify server: SWITTSSDK
+    environment variable not set, cannot locate the default
+    Speechify engine configuration file </error>
+    <error num="6002" severity="2">Speechify server: Invalid argument
+    to SWIttsTerm( ) </error>
+    <error num="6003" severity="2">Speechify server: Invalid argument
+    to SWIttsOpenPort( ) </error>
+    <error num="6004" severity="2">Speechify server: Invalid argument
+    to SWIttsOpenPortEx( ) </error>
+    <error num="6005" severity="2">Speechify server: Invalid argument
+    for SWIttsResourceAllocate( ) </error>
+    <error num="6006" severity="2">Speechify server: Invalid argument
+    for SWIttsResourceFree( ) </error>
+    <error num="6007" severity="2">Speechify server: Invalid argument
+    to SWIttsSpeak( ) </error>
+    <error num="6008" severity="2">Speechify server: Invalid argument
+    to SWIttsSpeakEx( ) </error>
+    <error num="6009" severity="2">Speechify server: Invalid argument
+    for SWIttsSetParameter( ) </error>
+    <error num="6010" severity="2">Speechify server: Invalid argument
+    for SWIttsGetParameter( ) </error>
+    <error num="6011" severity="2">Speechify server: Invalid argument
+    for SWIttsDictionaryLoad( ) </error>
+    <error num="6012" severity="2">Speechify server: Invalid argument
+    for SWIttsDictionaryFree( ) </error>
+    <error num="6013" severity="2">Speechify server: Invalid argument
+    for SWIttsDictionaryActivate( ) </error>
+    <error num="6014" severity="2">Speechify server: Invalid argument
+    for SWIttsAddDictionaryEntry( ) </error>
+    <error num="6015" severity="2">Speechify server: Invalid argument
+    for SWIttsDeleteDictionaryEntry( ) </error>
+    <error num="6016" severity="2">Speechify server: Invalid argument
+    for SWIttsResetDictionary( ) </error>
+    <error num="6017" severity="2">Speechify server: Invalid argument
+    for SWIttsLookupDictionaryEntry( ) </error>
+    <error num="6018" severity="2">Speechify server: Invalid argument
+    for SWIttsGetDictionaryKeys( ) </error>
+    <error num="6019" severity="3">Speechify server: Client
+    specific configuration parameters are not supported </error>
+    <error num="6020" severity="3">Speechify server: Invalid argument
+    for SWIttsLogDiag( ) </error>
+    <error num="6021" severity="3">Speechify server: Client specific
+    configuration parameters are not supported </error>
+    <error num="6022" severity="1">Speechify server: Engine is not
+    initialized </error>
+    <error num="6023" severity="2">Speechify server: Engine is already
+    initialized </error>
+    <error num="6024" severity="5">Speechify server: TTS engine
+    creation failed </error>
+    <error num="6025" severity="1">Speechify server: Unsupported
+    SWIttsResources structure version for SWIttsInitEx( ) </error>
+    <error num="6026" severity="1">Speechify server: Failed to
+    initialize the process thread stack size </error>
+    <error num="6027" severity="2">Speechify server: Internal error,
+    failed to stop a port TTS engine instance </error>
+    <error num="6036" severity="2">Speechify server: Failed to wait
+    for engine thread shutdown </error>
+    <error num="6037" severity="2">Speechify server: Could not
+    shutdown an open port when terminating the engine </error>
+    <error num="6038" severity="2">Speechify server: Internal error,
+    could not close a port TTS engine instance </error>
+    <error num="6039" severity="2">Speechify server: Internal error,
+    could not destroy a port logging resource </error>
+    <error num="6040" severity="2">Speechify server: Failed to open a
+    port TTS engine instance </error>
+    <error num="6041" severity="2">Speechify server: Failed to
+    register callbacks for a port TTS engine instance </error>
+    <error num="6042" severity="2">Speechify server: Invalid
+    SWIttsOpenPortEx( ) key value pair, key with no value </error>
+    <error num="6043" severity="2">Speechify server: Invalid
+    SWIttsOpenPortEx( ) key value pair, empty value </error>
+    <error num="6044" severity="2">Speechify server: Invalid
+    SWIttsOpenPortEx( ) key value pair, duplicate key </error>
+    <error num="6045" severity="2">Speechify server: Unexpected TTS
+    engine speak failure </error>
+    <error num="6046" severity="2">Speechify server: Internal error,
+    invalid speak thread request </error>
+    <error num="6047" severity="2">Speechify server: Internal error,
+    unexpected state machine transition </error>
+    <error num="6048" severity="2">Speechify server: Internal error,
+    attempt to transition to the previous state when there is no
+    previous state </error>
+    <error num="6056" severity="2">Speechify server: Invalid character
+    for the specified character set within the speak input text </error>
+    <error num="6059" severity="2">Speechify server: Could not
+    allocate memory for copying the decoded speak input text </error>
+    <error num="6060" severity="2">Speechify server: Could not
+    grow memory for copying the decoded speak input text </error>
+    <error num="6062" severity="2">Speechify server: Internal error,
+    NULL front-end handle for TTS engine front-end creation </error>
+    <error num="6064" severity="1">Speechify server: Could not load
+    the front-end library </error>
+    <error num="6066" severity="1">Speechify server: Invalid front-end
+    library, missing a required symbol </error>
+    <error num="6067" severity="2">Speechify server: Internal error,
+    front-end library start failed </error>
+    <error num="6068" severity="2">Speechify server: Internal error,
+    front-end library process sentences failed </error>
+    <error num="6069" severity="2">Speechify server: Internal error,
+    front-end library process remaining failed </error>
+    <error num="6070" severity="2">Speechify server: Internal error,
+    front-end library flush due to stop failed </error>
+    <error num="6071" severity="2">Speechify server: Internal error,
+    front-end library normal flush failed </error>
+    <error num="6072" severity="2">Speechify server: Dictionary add
+    failed due to an empty key or translation string </error>
+    <error num="6073" severity="2">Speechify server: Dictionary add
+    failed due to an invalid key or translation </error>
+    <error num="6074" severity="2">Speechify server: Dictionary add
+    failed due to an invalid dictionary type </error>
+    <error num="6075" severity="2">Speechify server: Dictionary add
+    failed </error>
+    <error num="6076" severity="2">Speechify server: Dictionary delete
+    entry failed due to an invalid key length </error>
+    <error num="6077" severity="2">Speechify server: Dictionary delete
+    entry failed due to an invalid key </error>
+    <error num="6078" severity="2">Speechify server: Dictionary delete
+    entry failed due to an invalid dictionary type </error>
+    <error num="6079" severity="2">Speechify server: Dictionary delete
+    entry failed </error>
+    <error num="6080" severity="2">Speechify server: Get dictionary
+    entries failed due to an invalid parameter </error>
+    <error num="6081" severity="2">Speechify server: Get dictionary
+    entries failed due to an invalid dictionary type </error>
+    <error num="6083" severity="2">Speechify server: Lookup dictionary
+    entry failed due to an invalid parameter </error>
+    <error num="6085" severity="2">Speechify server: Lookup dictionary
+    entry failed due to an invalid key </error>
+    <error num="6086" severity="2">Speechify server: Lookup dictionary
+    entry failed due to an invalid dictionary type </error>
+    <error num="6087" severity="2">Speechify server: Lookup dictionary
+    entry failed </error>
+    <error num="6088" severity="2">Speechify server: Reset dictionary
+    failed during update </error>
+    <error num="6089" severity="2">Speechify server: Reset dictionary
+    failed due to an invalid dictionary type </error>
+    <error num="6090" severity="2">Speechify server: Reset dictionary
+    failed during find first </error>
+    <error num="6091" severity="2">Speechify server: Load default
+    dictionary failed </error>
+    <error num="6092" severity="2">Speechify server: Dictionary load
+    failed due to an invalid dictionary type </error>
+    <error num="6093" severity="2">Speechify server: Dictionary load
+    failed due to an invalid parameter </error>
+    <error num="6094" severity="2">Speechify server: Dictionary load
+    failed, dictionary already loaded </error>
+    <error num="6095" severity="2">Speechify server: Dictionary load
+    failed, XML parse failed </error>
+    <error num="6096" severity="2">Speechify server: Dictionary load
+    failed </error>
+    <error num="6097" severity="2">Speechify server: Dictionary free
+    failed, dictionary not already loaded </error>
+    <error num="6098" severity="2">Speechify server: Dictionary free
+    failed, cannot free an active dictionary </error>
+    <error num="6099" severity="2">Speechify server: Dictionary free
+    failed </error>
+    <error num="6100" severity="2">Speechify server: Dictionary
+    activate failed, dictionary not loaded </error>
+    <error num="6101" severity="2">Speechify server: Dictionary
+    activate failed, dictionary already activated </error>
+    <error num="6102" severity="2">Speechify server: Dictionary
+    activate failed, dictionary priority already used for another
+    dictionary </error>
+    <error num="6103" severity="2">Speechify server: Dictionary
+    activate failed, invalid priority </error>
+    <error num="6104" severity="2">Speechify server: Dictionary
+    activate failed </error>
+    <error num="6108" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6109" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6110" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6111" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6112" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6113" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6114" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6115" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6116" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6117" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6118" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6119" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6120" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6121" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6122" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6123" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6124" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6125" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6126" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6127" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6128" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6129" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6130" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6131" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6132" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6133" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6134" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6135" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6136" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6137" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6138" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6139" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6140" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6141" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6142" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6143" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6144" severity="2">Speechify server: Internal error,
+    ESPR parse error </error>
+    <error num="6146" severity="2">Speechify server: Internal error,
+    invalid argument for TTS engine pre-processor creation </error>
+    <error num="6147" severity="5">Speechify server: Internal error,
+    SSML parse failed </error>
+    <error num="6148" severity="2">Speechify server: Unsupported
+    media type for TTS engine pre-processing </error>
+    <error num="6149" severity="2">Speechify server: Internal error,
+    NULL text for TTS engine copy pre-processed text </error>
+    <error num="6151" severity="2">Speechify server: Internal error,
+    NULL text for TTS engine get pre-processed text </error>
+    <error num="6154" severity="2">Speechify server: Internal error,
+    NULL text for TTS engine copy pre-processed dictionary text </error>
+    <error num="6156" severity="2">Speechify server: Internal error,
+    NULL text for TTS engine get pre-processed dictionary text </error>
+    <error num="6158" severity="1">Speechify server: Could not load
+    the romanizer library </error>
+    <error num="6160" severity="2">Speechify server: Internal error,
+    NULL romanizer handle for TTS engine romanizer creation </error>
+    <error num="6161" severity="2">Speechify server: Internal error,
+    invalid argument for TTS engine romanizer creation </error>
+    <error num="6162" severity="2">Speechify server: Specified character
+    set is not supported by the romanizer </error>
+    <error num="6163" severity="2">Speechify server: Romanizer text
+    addition failed </error>
+    <error num="6164" severity="2">Speechify server: Internal error,
+    NULL romanized text pointer for get text </error>
+    <error num="6165" severity="2">Speechify server: Internal error,
+    romanizer process sentences failed </error>
+    <error num="6166" severity="2">Speechify server: Dictionary add
+    failed, character set is not supported </error>
+    <error num="6167" severity="2">Speechify server: Dictionary add
+    failed, invalid dictionary type </error>
+    <error num="6168" severity="2">Speechify server: Dictionary add
+    failed, invalid part of speech </error>
+    <error num="6169" severity="2">Speechify server: Dictionary add
+    failed, invalid dictionary entry </error>
+    <error num="6170" severity="2">Speechify server: Dictionary add
+    failed </error>
+    <error num="6171" severity="2">Speechify server: Dictionary delete
+    failed, character set is not supported </error>
+    <error num="6172" severity="2">Speechify server: Dictionary delete
+    failed, invalid dictionary type </error>
+    <error num="6173" severity="2">Speechify server: Dictionary delete
+    failed, invalid dictionary entry </error>
+    <error num="6174" severity="2">Speechify server: Dictionary delete
+    failed </error>
+    <error num="6175" severity="2">Speechify server: Get dictionary
+    entries failed, invalid dictionary entry </error>
+    <error num="6176" severity="2">Speechify server: Get dictionary
+    entries failed, invalid dictionary type </error>
+    <error num="6177" severity="2">Speechify server: Get dictionary
+    entries failed </error>
+    <error num="6178" severity="2">Speechify server: Get dictionary
+    entries failed, invalid dictionary type </error>
+    <error num="6179" severity="2">Speechify server: Get dictionary
+    entries failed </error>
+    <error num="6181" severity="2">Speechify server: Lookup dictionary
+    entry failed, invalid argument </error>
+    <error num="6183" severity="2">Speechify server: Lookup dictionary
+    entry failed, unsupported character set </error>
+    <error num="6184" severity="2">Speechify server: Lookup dictionary
+    entry failed, invalid dictionary type </error>
+    <error num="6185" severity="2">Speechify server: Lookup dictionary
+    entry failed, invalid part of speech </error>
+    <error num="6186" severity="2">Speechify server: Lookup dictionary
+    entry failed, invalid parameter </error>
+    <error num="6187" severity="2">Speechify server: Lookup dictionary
+    entry failed </error>
+    <error num="6188" severity="2">Speechify server: Reset dictionary
+    failed </error>
+    <error num="6189" severity="2">Speechify server: Reset dictionary
+    failed, invalid dictionary type </error>
+    <error num="6190" severity="2">Speechify server: Reset dictionary
+    failed </error>
+    <error num="6191" severity="2">Speechify server: Dictionary load
+    failed, invalid dictioanry type </error>
+    <error num="6192" severity="2">Speechify server: Dictionary load
+    failed, invalid parameter </error>
+    <error num="6193" severity="2">Speechify server: Dictionary load
+    failed, dictionary already loaded </error>
+    <error num="6194" severity="2">Speechify server: Dictionary load
+    failed, XML parse error </error>
+    <error num="6195" severity="2">Speechify server: Dictionary load
+    failed </error>
+    <error num="6196" severity="2">Speechify server: Dictionary free
+    failed, dictionary not loaded </error>
+    <error num="6197" severity="2">Speechify server: Dictionary free
+    failed, cannot free an active dictionary </error>
+    <error num="6198" severity="2">Speechify server: Dictionary free
+    failed </error>
+    <error num="6199" severity="2">Speechify server: Dictionary
+    activate failed, dictionary not loaded </error>
+    <error num="6200" severity="2">Speechify server: Dictionary
+    activate failed, dictionary already activated </error>
+    <error num="6201" severity="2">Speechify server: Dictionary
+    activate failed, dictionary priority already used for another
+    dictionary </error>
+    <error num="6202" severity="2">Speechify server: Dictionary
+    activate failed, invalid priority </error>
+    <error num="6203" severity="2">Speechify server: Dictionary
+    activate failed </error>
+    <error num="6204" severity="1">Speechify server: Invalid romanizer
+    library, missing a required symbol </error>
+    <error num="6205" severity="2">Speechify server: Load default
+    dictionary failed </error>
+    <error num="6206" severity="2">Speechify server: Internal error,
+    invalid argument for adding text to the romanizer </error>
+    <error num="6207" severity="2">Speechify server: Unsupported
+    character encoding for the current language </error>
+    <error num="6208" severity="5">Speechify server: Internal error,
+    failed to get the full text from a client text object </error>
+    <error num="6210" severity="2">Speechify server: Internal error,
+    NULL text pointer to get text </error>
+    <error num="6212" severity="2">Speechify server: Could not
+    initialize licensing, tts.server.licenseServerList configuration
+    parameter is empty </error>
+    <error num="6213" severity="1">Speechify server: Could initialize
+    licensing, tts.server.licensingMode configuration parameter
+    has an invalid value </error>
+    <error num="6215" severity="2">Speechify server: Could not create
+    required Internet fetch resources for a TTS engine </error>
+    <error num="6216" severity="2">Speechify server: Could not create
+    required parser resources for a TTS engine </error>
+    <error num="6217" severity="2">Speechify server: Could not create
+    required pre-processor resources for a TTS engine </error>
+    <error num="6218" severity="2">Speechify server: Could not create
+    required front-end resources for a TTS engine </error>
+    <error num="6219" severity="2">Speechify server: Could not create
+    required user dictionary resources for a TTS engine </error>
+    <error num="6221" severity="2">Speechify server: Could not create
+    the required unit selection resource for a TTS engine </error>
+    <error num="6223" severity="2">Speechify server: Could not create
+    the required audio concatenation resource for a TTS engine </error>
+    <error num="6224" severity="2">Speechify server: Could not
+    validate licenses before a speak operation in default mode </error>
+    <error num="6225" severity="2">Speechify server: Licenses not
+    allocated prior to a speak operation in explicit mode </error>
+    <error num="6226" severity="2">Speechify server:
+    SWIttsResourceAllocate( ) is only valid when
+    tts.server.licensingMode is set to explicit </error>
+    <error num="6227" severity="2">Speechify server: Could not
+    validate a license prior to a speak operation, invalid licensing
+    mode </error>
+    <error num="6228" severity="2">Speechify server: Could not
+    validate licenses after a speak operation in default mode </error>
+    <error num="6229" severity="2">Speechify server: Could not
+    validate licenses after a speak operation in explicit mode </error>
+    <error num="6230" severity="2">Speechify server: 
+    SWIttsResourceFree( ) is only valid when
+    tts.server.licensingMode is set to explicit </error>
+    <error num="6231" severity="2">Speechify server: Could not
+    validate a license after a speak operation, invalid licensing mode
+    </error>
+    <error num="6232" severity="2">Speechify server: Invalid feature
+    name for SWIttsResourceAllocate( ) </error>
+    <error num="6233" severity="2">Speechify server: Invalid feature
+    name for SWIttsResourceFree( ) </error>
+    <error num="6234" severity="2">Speechify server: Internal error,
+    audio insertion bookmarks are out of order </error>
+    <error num="6236" severity="2">Speechify server: Internal error,
+    invalid argument for user dictionary object creation </error>
+    <error num="6238" severity="2">Speechify server: Internal flite
+    error </error>
+    <error num="6239" severity="2">Speechify server: Invalid argument
+    to get pronunciation </error>
+    <error num="6242" severity="2">Speechify server: Invalid
+    SWIttsOpenPortEx( ) parameter list, unterminated key </error>
+    <error num="6243" severity="2">Speechify server: Invalid
+    SWIttsOpenPortEx( ) parameter list, empty value </error>
+    <error num="6244" severity="2">Speechify server: Invalid
+    SWIttsOpenPortEx( ) parameter list, duplicate parameters </error>
+    <error num="6245" severity="2">Speechify server: </error>
+    <error num="6246" severity="2">Speechify server: Invalid argument
+    to validate pronunciation </error>
+    <error num="6247" severity="2">Speechify server: </error>
+    <error num="6248" severity="2">Speechify server: </error>
+    <error num="6249" severity="2">Speechify server: Internal error,
+    no absolute URL returned for a dictionary fetch </error>
+    <error num="6250" severity="2">Speechify server: Internal error,
+    no MIME content type returned for a dictionary fetch </error>
+    <error num="6251" severity="2">Speechify server: </error>
+    <error num="6252" severity="3">Speechify server: No size returned
+    for a dictionary fetch </error>
+    <error num="6253" severity="2">Speechify server: </error>
+    <error num="6254" severity="2">Speechify server: </error>
+    <error num="6255" severity="3">Speechify server: Web server
+    returned an incorrect size for a dictionary fetch </error>
+    <error num="6256" severity="2">Speechify server: </error>
+    <error num="6257" severity="2">Speechify server: </error>
+    <error num="6258" severity="2">Speechify server: Dictionary URI
+    specified in the config file is not found </error>
+    <error num="6259" severity="2">Speechify server: Invalid log file
+    write mode, using the default value of flushAfterWrite </error>
+    <error num="6260" severity="3">Speechify server: Invalid
+    diagnostic tag number in tts.log.diagnostic.tags </error>
+    <error num="6261" severity="3">Speechify server: Not authorized to
+    enable a diagnostic tag listed in tts.log.diagnostic.tags </error>
+    <error num="6262" severity="2">Speechify server: Internal error,
+    could not allocate memory </error>
+    <error num="6263" severity="2">Speechify server: Internal error,
+    could not allocate memory </error>
+    <error num="6264" severity="2">Speechify server: Internal error,
+    could not allocate memory </error>
+    <error num="6265" severity="2">Speechify server: Internal error,
+    could not allocate memory </error>
+    <error num="6266" severity="2">Speechify server: </error>
+    <error num="6267" severity="2">Speechify server: Internal error, 
+    can't set absolute URL </error>
+    <error num="6268" severity="2">Speechify server: Internal error,
+    no absolute URL returned for a dictionary fetch </error>
+    <error num="6269" severity="2">Speechify server: Internal error,
+    no MIME content type returned for a dictionary fetch </error>
+    <error num="6270" severity="3">Speechify server: No size returned
+    for a dictionary fetch </error>
+    <error num="6271" severity="2">Speechify server: </error>
+    <error num="6272" severity="2">Speechify server: </error>
+    <error num="6273" severity="3">Speechify server: Web server
+    returned an incorrect size for a text fetch </error>
+    <error num="6274" severity="2">Speechify server: </error>
+    <error num="6275" severity="2">Speechify server: </error>
+    <error num="6276" severity="2">Speechify server: </error>
+    <error num="6277" severity="2">Speechify server: </error>
+    <error num="6278" severity="2">Speechify server: Dictionary uri
+    specified in the config file is not found </error>
+    <error num="6279" severity="3">Speechify server: Audio logging to
+    dump file failed </error>
+    <error num="6280" severity="3">Speechify server: Invalid
+    priority value for dictionary reference markup, using a default
+    priority </error>
+    <error num="6281" severity="2">Speechify server: Invalid
+    URI value for dictionary reference markup, ignoring the dictionary
+    </error>
+    <error num="6282" severity="2">Speechify server: Dictionary
+    free of dictionary specified via markup failed </error>
+    <error num="6283" severity="2">Speechify server: Dictionary
+    load of dictionary specified via markup failed </error>
+    <error num="6284" severity="2">Speechify server: Dictionary
+    free of dictionary specified via markup failed </error>
+    <error num="6285" severity="2">Speechify server: Dictionary
+    activate of dictionary specified via markup failed </error>
+    <error num="6286" severity="2">Speechify server: Dictionary
+    deactivate of dictionary specified via markup failed </error>
+    <error num="6287" severity="3">Speechify server: Invalid SPR entered </error>
+    <error num="6288" severity="3">Speechify server: Internal error,
+    no mapping for internal return code </error>
+    <error num="6289" severity="2">Speechify server: Invalid server
+    volume value specified by tag </error>
+    <error num="6290" severity="3">Speechify server: Server volume
+    value set by tag to potential clipping value </error>
+    <error num="6291" severity="2">Speechify server: Invalid port
+    volume value specified by tag </error>
+    <error num="6292" severity="3">Speechify server: Port volume value
+    set by tag to potential clipping value </error>
+    <error num="6293" severity="2">Speechify server: Invalid server
+    rate value set by tag </error>
+    <error num="6294" severity="3">Speechify server: Server rate value
+    set by tag limited to minimum value </error>
+    <error num="6295" severity="3">Speechify server: Server rate value
+    set by tag limited to maximum value </error>
+    <error num="6296" severity="2">Speechify server: Invalid port
+    rate value set by tag </error>
+    <error num="6297" severity="3">Speechify server: Port rate value
+    set by tag limited to minimum value </error>
+    <error num="6298" severity="3">Speechify server: Port rate value
+    set by tag limited to maximum value </error>
+    <error num="6299" severity="2">Speechify server: Invalid
+    volume value </error>
+    <error num="6300" severity="2">Speechify server: Invalid
+    rate value </error>
+    <error num="6301" severity="3">Speechify server: Internal error,
+    no mapping for internal return code </error>
+    <error num="6302" severity="3">Speechify server: Volume set to a
+    potential clipping value </error>
+    <error num="6303" severity="2">Speechify server: Unsupported
+    character encoding for TTS engine pre-processing </error>
+    <error num="6304" severity="2">Speechify server: Unsupported
+    content type for TTS engine pre-processing </error>
+    <error num="6305" severity="2">Speechify server: Dictionary
+    reference markup must preceed all other text, ignoring the
+    dictionary </error>
+    <error num="6306" severity="3">Speechify server:
+    tts.network.packetsize value out-of-range </error>
+    <error num="6307" severity="3">Speechify server:
+    tts.network.packetsize value must be an even number of bytes </error>
+    <error num="6308" severity="3">Speechify server:
+    Dictionary key is too large </error>
+    <error num="6309" severity="3">Speechify server:
+    Dictionary translation is too large </error>
+    <error num="6310" severity="2">Speechify server:
+    No memory to store dictionary key </error>
+    <error num="6311" severity="2">Speechify server:
+    No memory to store dictionary translation </error>
+    <error num="6312" severity="2">Speechify server:
+    Error inserting dictionary entry
+    into internal dictionary </error>
+    <error num="6313" severity="3">Speechify server:
+    Dictionary key is invalid </error>
+    <error num="6314" severity="3">Speechify server:
+    Dictionary translation is invalid </error>
+    <error num="6315" severity="3">Speechify server:
+    Loading dictionary aborted due to errors </error>
+    <error num="6316" severity="2">Speechify server:
+    Internal error validating dictionary entry </error>
+    <error num="6317" severity="2">Speechify server: Internal error,
+    failed to create a client text object </error>
+
+    <!-- Server usel errors -->
+    <error num="7000" severity="1">Speechify server: Unit selection
+    not initialized </error>
+    <error num="7002" severity="3">Speechify server: Failed to load
+    the unit selection pre-selection cache </error>
+    <error num="7003" severity="1">Speechify server: Unit selection
+    database load failed, failed to open a database file </error>
+    <error num="7004" severity="1">Speechify server: Unit selection
+    database load failed, database is corrupt </error>
+    <error num="7015" severity="1">Speechify server: Unit selection
+    database load failed, memory allocation failed </error>
+    <error num="7016" severity="1">Speechify server: Unit selection
+    database load failed, insufficient memory pre-allocation </error>
+    <error num="7017" severity="1">Speechify server: Unit selection
+    database load failed, no join method configured </error>
+    <error num="7018" severity="1">Speechify server: Unit selection
+    database load failed, memory allocator failed </error>
+    <error num="7019" severity="1">Speechify server: Voice version is
+    not supported by this server version </error>
+    <error num="7020" severity="1">Speechify server: Unit selection
+    database load failed, database read failed </error>
+    <error num="7022" severity="1">Speechify server: Unit selection
+    database load failed, unsupported database schema </error>
+    <error num="7048" severity="1">Speechify server: Internal error,
+    corrupt unit selection graph </error>
+    <error num="7049" severity="2">Speechify server: Internal error,
+    unit selection traceback failed </error>
+    <error num="7050" severity="2">Speechify server: Internal error,
+    unit selection traceback failed </error>
+    <error num="7052" severity="1">Speechify server: Speechify 2.0
+    and earlier voices are no longer supported </error>
+    <error num="7053" severity="2">Speechify server: Unit selection
+    file open for voice building data dump failed </error>
+    <error num="7054" severity="2">Speechify server: Internal error,
+    unknown unit selection algorithm for voice </error>
+    <error num="7055" severity="3">Speechify server: Internal error,
+    unit selection voice label mapping error </error>
+    <error num="7056" severity="3">Speechify server: Internal error,
+    unknown feature function result type </error>
+    <error num="7057" severity="3">Speechify server: Internal error,
+    unit selection failed for phone </error>
+    <error num="7058" severity="3">Speechify server: Internal error,
+    unknown context type </error>
+    <error num="7059" severity="3">Speechify server: Internal error,
+    no valid units found at index </error>
+    <error num="7060" severity="3">Speechify server: Internal error,
+    too many half-phones </error>
+    <error num="7061" severity="2">Speechify server: Internal error,
+    invalid phoneme index </error>
+    <error num="7062" severity="2">Speechify server: Internal error,
+    invalid feature index </error>
+    <error num="7063" severity="2">Speechify server: Internal error,
+    invalid feature lookup value </error>
+    <error num="7064" severity="3">Speechify server: Invalid speed
+    versus quality value </error>
+    <error num="7065" severity="2">Speechify server: Unit selection
+    voice building detailed stats dump failed, must use a development
+    voice </error>
+
+    <!-- Server wsola errors -->
+    <error num="8000" severity="1">Speechify server: Audio
+    concatenation database load failed, failed to open a database file
+    </error>
+    <error num="8001" severity="1">Speechify server: Audio
+    concatenation initialization failed, invalid sampling rate </error>
+    <error num="8003" severity="1">Speechify server: Audio
+    concatenation database load failed, memory allocation failed </error>
+    <error num="8004" severity="1">Speechify server: Audio
+    concatenation database load failed, insufficient memory
+    pre-allocation </error>
+    <error num="8007" severity="1">Speechify server: Audio
+    concatenation database load failed, database is corrupt </error>
+    <error num="8012" severity="1">Speechify server: Audio
+    concatenation database load failed, memory allocator failed </error>
+    <error num="8019" severity="1">Speechify server: Audio
+    concatenation database load failed, file seek failed </error>
+    <error num="8020" severity="1">Speechify server: Audio
+    concatenation database load failed, file read failed </error>
+    <error num="8021" severity="1">Speechify server: Audio
+    concatenation database load failed, file seek beyond end </error>
+    <error num="8022" severity="1">Speechify server: Audio
+    concatenation database load failed, file seek beyond end </error>
+    <error num="8023" severity="1">Speechify server: Audio
+    concatenation not initialized </error>
+    <error num="8024" severity="1">Speechify server: Audio database
+    open failed </error>
+
+    <!-- Server licensing errors -->
+    <error num="9000" severity="1">SWIlicense: Cannot create flex
+    mutex</error> 
+    <error num="9001" severity="1">SWIlicense: Cannot lock flex
+    mutex</error> 
+    <error num="9002" severity="1">SWIlicense: Cannot lock flex
+    mutex</error> 
+    <error num="9003" severity="1">SWIlicense: Cannot lock flex
+    mutex</error> 
+    <error num="9004" severity="1">SWIlicense: Cannot destroy flex
+    mutex</error> 
+
+    <error num="9050" severity="1">SWIlicense: Error obtaining the
+    configured license server list</error> 
+    <error num="9051" severity="2">SWIlicense: Please contact
+    ScanSoft technical support for further information on
+    installing an appropriate license</error> 
+    <error num="9052" severity="3">SWIlicense reconnect callback:
+    Trying to re-establish a license server connection, possible
+    problems communicating with server</error> 
+    <error num="9053" severity="3">SWIlicense reconnect-success
+    callback: Successfully re-established license server
+    connection</error> 
+    <error num="9054" severity="2">SWIlicense failure callback:
+    Failed to re-establish connection to license server. Unable to
+    perform any further TTS operations</error> 
+    <error num="9055" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_PERROR_MSGBOX</error> 
+    <error num="9056" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_PROMPT_FOR_FILE</error> 
+    <error num="9057" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_WINDOWS_MODULE_HANDLE</error> 
+    <error num="9058" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_LICENSE_DEFAULT</error> 
+    <error num="9059" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_CKOUT_INSTALL_LIC</error> 
+    <error num="9060" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_MT_CONNECT</error> 
+    <error num="9061" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_TCP_TIMEOUT</error> 
+    <error num="9062" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_CHECK_INTERVAL</error> 
+    <error num="9063" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_RETRY INTERVAL</error> 
+    <error num="9064" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_RETRY COUNT</error> 
+    <error num="9065" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_USER_RECONNECT</error> 
+    <error num="9066" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_USER_RECONNECT_DONE</error> 
+    <error num="9067" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_USER_EXITCALL</error> 
+    <error num="9068" severity="2">SWIlicense: Attempted to exceed the
+    maximum number of jobs</error> 
+    <error num="9069" severity="2">SWIlicense: Error calling
+    lc_new_job</error> 
+    <error num="9070" severity="2">SWIlicense: Error setting extra
+    attributes</error> 
+    <error num="9071" severity="2">SWIlicense: Error setting default
+    license path</error> 
+    <error num="9072" severity="2">SWIlicense: Error setting vendor
+    data</error> 
+    <error num="9073" severity="2">SWIlicense: Maximum job count limit
+    exceeded</error> 
+    <error num="9074" severity="2">SWIlicense: Error calling
+    lc_checkout license</error> 
+    <error num="9075" severity="2">SWIlicense: Error creating a new
+    job; job limit possibly exceeded</error> 
+    <error num="9076" severity="2">SWIlicense: Error calling
+    lc_checkout license</error> 
+    <error num="9077" severity="2">SWIlicense: Error configuring
+    flexLM with first call to lc_new_job</error> 
+    <error num="9078" severity="2">SWIlicense: License object handle
+    is NULL</error> 
+    <error num="9079" severity="2">SWIlicense: License server
+    unavailable, cannot check out license</error> 
+    <error num="9080" severity="2">SWIlicense: Internal error in
+    SWIlicenseLock; feature name inconsistent</error> 
+    <error num="9081" severity="2">SWIlicense: License object handle
+    is NULL</error> 
+    <error num="9082" severity="2">SWIlicense: Error setting vendor
+    data</error> 
+    <error num="9083" severity="2">SWIlicense: License object handle
+    is NULL</error> 
+    <error num="9084" severity="2">SWIlicense: License server
+    compromised, cannot validate license</error> 
+    <error num="9085" severity="2">SWIlicense: Error setting vendor
+    data</error> 
+    <error num="9086" severity="2">SWIlicense: Error setting flexlm
+    attribute LM_A_VENDOR_CALLBACK_DATA</error> 
+    <error num="9087" severity="3">SWIlicense: No user data in
+    callback. This probably means no licenses are currently checked
+    out </error>
+    <error num="9088" severity="3">SWIlicense: No user data in
+    callback. This probably means no licenses are currently checked
+    out </error>
+    <error num="9089" severity="2">SWIlicense: Application is not
+    licensed to access Speechify. Please contact ScanSoft 
+    technical support for further information on obtaining an
+    appropriate license. </error>
+    <error num="9090" severity="2">SWIlicense: Internal license
+    validation error </error>
+    <error num="9091" severity="2">SWIlicense: Cannot create thread,
+    unable to recover </error>
+    <error num="9092" severity="2">SWIlicense: Cannot destroy thread
+    handle, probable memory leak </error>
+    <error num="9093" severity="2">SWIlicense: Internal error, license
+    name or version is NULL for checkout </error>
+    <error num="9094" severity="2">SWIlicense: Exception caught in
+    lc_checkout </error>
+    <error num="9095" severity="2">SWIlicense: Exception caught in
+    lc_checkin </error>
+
+    <!-- MMC snap-in errors -->
+    <error num="9500" severity="2">InitCommonControlsEx() failed</error>
+    <error num="9501" severity="2">GetSaveFileName() failed</error>
+    <error num="9502" severity="2">RegOpenKeyEx(KEY_ENUMERATE_SUB_KEYS)
+    failed</error>
+    <error num="9503" severity="2">RegOpenKeyEx(KEY_ENUMERATE_SUB_KEYS) 
+    failed</error>
+    <error num="9504" severity="2">Couldn't read InstallPath data
+    value from registry</error>
+    <error num="9505" severity="2">CreateProcess() failed</error>
+    <error num="9506" severity="2">ShellExecute() failed</error>
+    <error num="9507" severity="2">OpenSCManager() failed</error>
+    <error num="9508" severity="2">OpenService() failed</error>
+    <error num="9509" severity="2">QueryServiceStatus() failed</error>
+    <error num="9510" severity="2">OpenSCManager() failed</error>
+    <error num="9511" severity="2">OpenService() failed</error>
+    <error num="9512" severity="2">StartService() failed</error>
+    <error num="9513" severity="2">QueryServiceStatus() failed</error>
+    <error num="9514" severity="2">QueryServiceStatus() failed</error>
+    <error num="9515" severity="2">OpenSCManager() failed</error>
+    <error num="9516" severity="2">OpenService() failed</error>
+    <error num="9517" severity="2">ControlService() failed</error>
+    <error num="9518" severity="2">QueryServiceStatus() failed</error>
+    <error num="9519" severity="2">OpenSCManager() failed</error>
+    <error num="9520" severity="2">GetServiceDisplayName() failed</error>
+    <error num="9521" severity="2">Could not open voice .INDEX file to
+    retrieve minimum server version required</error>
+    <error num="9522" severity="2">MMC config file contains a tag id
+    that is out of range</error>
+    <error num="9523" severity="2">GetModuleFileName() failed</error>
+    <error num="9524" severity="2">Buffer passed to GetModuleFileName
+    was too small</error>
+    <error num="9525" severity="2">SWIttsMMC.dll is not installed in a
+    path that contains "bin"</error>
+    <error num="9526" severity="2">Could not load the config file for
+    the Speechify MMC snap-in</error>
+    <error num="9527" severity="2">Missing a required parameter in the
+    SWIttsConfigMMC.xml file</error>
+    <error num="9528" severity="2">Invalid value for parameter
+    tts.log.diagnostic.fileWriteMode in SWIttsConfigMMC.xml</error>
+    <error num="9529" severity="2">Could not initialize logging system
+    based on settings in config file</error>
+    <error num="9530" severity="2">QueryServiceConfig() failed</error>
+    <error num="9531" severity="2">EnumDependentServices() failed</error>
+
+    <!-- Generic OS level server errors -->
+    <error num="10000" severity="2">Speechify server: Out of memory </error>
+    <error num="10001" severity="1">Speechify server: Mutex create
+    failed </error>
+    <error num="10002" severity="1">Speechify server: Mutex destroy
+    failed </error>
+    <error num="10003" severity="1">Speechify server: Mutex lock
+    failed </error>
+    <error num="10004" severity="1">Speechify server: Mutex unlock
+    failed </error>
+    <error num="10005" severity="1">Speechify server: Timer create
+    failed </error>
+    <error num="10006" severity="1">Speechify server: Timer destroy
+    failed </error>
+    <error num="10007" severity="1">Speechify server: Timer sleep
+    failed </error>
+    <error num="10008" severity="1">Speechify server: Timer wake
+    failed </error>
+    <error num="10009" severity="2">Speechify server: Thread create
+    failed </error>
+    <error num="10010" severity="2">Speechify server: Thread destroy
+    handle failed </error>
+    <error num="10011" severity="2">Speechify server: Thread join
+    failed </error>
+
+    <!-- Server Lexicon XML Parser errors -->
+    <error num="11000" severity="2">Speechify server: </error>
+    <error num="11001" severity="2">Speechify server: Insufficient memory
+    for creating a Lexicon resource </error>
+    <error num="11002" severity="2">Speechify server: Invalid argument
+    to Lexicon create resource </error>
+    <error num="11003" severity="2">Speechify server: Invalid argument
+    to Lexicon destroy resource </error>
+    <error num="11004" severity="2">Speechify server: Invalid argument
+    to Lexicon parse </error>
+    <error num="11005" severity="2">Speechify server: Dictionary
+    references an invalid DTD or schema </error>
+    <error num="11006" severity="2">Speechify server: Lexicon XML parse
+    fatal error </error>
+    <error num="11007" severity="2">Speechify server: Lexicon XML parse
+    error </error>
+    <error num="1108" severity="3">Speechify server: Lexicon XML parse
+    warning </error>
+    <error num="1109" severity="2">Speechify server: Error during transcoding
+    of the output </error>
+    <error num="1110" severity="2">Speechify server: Error creating the proper
+    transcoder </error>
+
+    <!-- Server Internet fetch errors -->
+    <error num="12100" severity="1">SBinet: Failed to initialize interface
+    </error>
+    <error num="12101" severity="1">SBinet: Failed to allocate interface
+    </error>
+    <error num="12102" severity="1">SBinet: NULL interface pointer </error>
+    <error num="12103" severity="1">SBinet: Out of memory </error>
+    <error num="12104" severity="1">SBinet: Installed Microsoft Internet
+    Explorer version is too old, 5.0 or later required </error>
+    <error num="12105" severity="1">SBinet: Microsoft Internet Explorer 5.0 or
+    later must be installed </error>
+    <error num="12106" severity="3">SBinet: No name found for cookie </error>
+    <error num="12107" severity="2">SBinet: Mutex lock failed, cache lock
+    table </error>
+    <error num="12108" severity="2">SBinet: Mutex unlock failed, cache lock
+    table </error>
+    <error num="12109" severity="1">SBinet: Failed to initialize sockets
+    subsystem </error>
+    <error num="12200" severity="2">SBinet: Invalid argument </error>
+    <error num="12201" severity="2">SBinet: Attempt to execute function when
+    not initialized </error>
+    <error num="12202" severity="2">SBinet: Cache initialization failure
+    </error>
+    <error num="12203" severity="2">SBinet: Prefetch error </error>
+    <error num="12204" severity="2">SBinet: Open error </error>
+    <error num="12205" severity="2">SBinet: Close error </error>
+    <error num="12206" severity="2">SBinet: Read error </error>
+    <error num="12207" severity="2">SBinet: Write error </error>
+    <error num="12208" severity="2">SBinet: Set cookie error </error>
+    <error num="12209" severity="2">SBinet: Get cookie error </error>
+    <error num="12210" severity="2">SBinet: Failed to add cookie (jar full)
+    </error>
+    <error num="12211" severity="2">SBinet: Failed to create cookie list
+    </error>
+    <error num="12212" severity="2">SBinet: Invalid cookie in the cookie jar
+    for SetCookieJar( ), null cookie </error>
+    <error num="12213" severity="2">SBinet: Invalid cookie in the cookie jar
+    for SetCookieJar( ), not a VXIMap </error>
+    <error num="12214" severity="2">SBinet: Invalid validator argument,
+    invalid VXIValue based type </error>
+    <error num="12215" severity="2">SBinet: Invalid validator argument,
+    corrupt VXIContent </error>
+    <error num="12216" severity="2">SBinet: Invalid validator argument,
+    invalid MIME content type </error>
+    <error num="12217" severity="2">SBinet: Open failed (internal error)
+    </error>
+    <error num="12218" severity="2">SBinet: Read failed (internal error)
+    </error>
+    <error num="12219" severity="2">SBinet: Fetch returned HTTP error </error>
+    <error num="12220" severity="2">SBinet: Get absolute name error </error>
+    <error num="12221" severity="2">SBinet: Failed to get HTTP status </error>
+    <error num="12222" severity="2">SBinet: Unable to get file 'stat'
+    information </error>
+    <error num="12223" severity="2">SBinet: File does not exist, open failed
+    </error>
+    <error num="12224" severity="2">SBinet: Failed reading from file </error>
+    <error num="12225" severity="2">SBinet: Failed to parse URL </error>
+    <error num="12226" severity="2">SBinet: Error unpacking validator, corrupt
+    content </error>
+    <error num="12227" severity="2">SBinet: Cache lock table full </error>
+    <error num="12228" severity="2">SBinet: Fetch operation timed out </error>
+    <error num="12229" severity="2">SBinet: Too many redirects. </error>
+    <error num="12230" severity="2">SBinet: Error opening cache entry </error>
+    <error num="12231" severity="2">SBinet: Error reading cache entry </error>
+    <error num="12232" severity="2">SBinet: Error writing cache entry </error>
+    <error num="12233" severity="2">SBinet: Error fetching property from cache
+    entry </error>
+    <error num="12234" severity="2">SBinet: Timeout locking cache entry for
+    reading </error>
+    <error num="12235" severity="2">SBinet: Timeout locking cache entry for
+    writing </error>
+    <error num="12236" severity="2">SBinet: Fetch timeout exceeded during Open
+    </error>
+    <error num="12237" severity="2">SBinet: Fetch timeout exceeded during Read
+    </error>
+    <error num="12238" severity="2">SBinet: Fetch timeout exceeded during
+    Write </error>
+    <error num="12239" severity="2">SBinet: Error closing cache entry </error>
+    <error num="12240" severity="2">SBinet: Socket error - cannot read from
+    socket </error>
+    <error num="12241" severity="2">SBinet: Socket error - time out connecting
+    to socket </error>
+    <error num="12242" severity="2">SBinet: Socket error - cannot set in
+    non-blocking mode </error>
+    <error num="12243" severity="2">SBinet: Socket error - cannot set in
+    blocking mode </error>
+    <error num="12244" severity="2">SBinet: Socket error - cannot connect
+    </error>
+    <error num="12245" severity="2">SBinet: Could not get data chunk size
+    </error>
+    <error num="12246" severity="2">SBinet: Could not parse data chunk size
+    </error>
+    <error num="12247" severity="2">SBinet: Cannot Redirect - location missing
+    or empty </error>
+    <error num="12248" severity="2">SBinet: Cannot Redirect - cannot parse
+    location </error>
+    <error num="12249" severity="2">SBinet: No data available on socket for
+    reading </error>
+    <error num="12250" severity="2">SBinet: Error reading or parsing HTTP
+    headers </error>
+    <error num="12251" severity="2">SBinet: Fetch timed out while reading from
+    cache </error>
+    <error num="12252" severity="2">SBinet: Could not parse cookie's name
+    </error>
+    <error num="12253" severity="2">SBinet: Expecting '=' after cookie's name
+    </error>
+    <error num="12254" severity="2">SBinet: Could not parse cookie's value
+    </error>
+    <error num="12255" severity="2">SBinet: Expecting ';' or ',' after
+    cookie's value </error>
+    <error num="12256" severity="2">SBinet: Could not parse cookie attribute's
+    name </error>
+    <error num="12257" severity="2">SBinet: Expecting '=' after cookie
+    attribute's name </error>
+    <error num="12258" severity="2">SBinet: Could not parse cookie attribute's
+    value </error>
+    <error num="12259" severity="2">SBinet: Expecting ';' or ',' after cookie
+    attribute's value </error>
+    <error num="12260" severity="2">SBinet: Expecting ';' or ',' after cookie
+    attribute </error>
+    <error num="12261" severity="2">SBinet: Cookie attribute has no associated
+    value </error>
+    <error num="12262" severity="2">SBinet: could not create HttpConnection.
+    </error>
+    <error num="12263" severity="2">SBinet: Invalid protocol for HTTP
+    connection </error>
+    <error num="12299" severity="2">SBinet: Unknown VXIcache error code,
+    cannot map to VXIinet error code </error>
+    <error num="12300" severity="3">SBinet: MIME content type not returned by
+    web server, extension mapping rule used </error>
+    <error num="12301" severity="3">SBinet: MIME content type not returned by
+    web server, no matching extension mapping rule </error>
+    <error num="12302" severity="3">SBinet: No expiration directive found in
+    response headers returned by web server, assuming immediate expiration
+    </error>
+    <error num="12303" severity="3">SBinet: Unknown MIME content type, no
+    matching extension mapping rule </error>
+    <error num="12304" severity="3">SBinet: Unknown media (MIME) encoding type
+    specified for submit, will use default type </error>
+    <error num="12305" severity="3">SBinet: Data too large, document will not
+    be cached </error>
+    <error num="12500" severity="2">SBinet: Socket operations: System call
+    failed </error>
+    <error num="12501" severity="2">SBinet: Socket operations: System call
+    timed out </error>
+    <error num="12502" severity="2">SBinet: Socket operations: System call
+    exception. Possible reason: connection attempt failed. </error>
+    <error num="12600" severity="3">SBinet: could not parse proxy rule,
+    Invalid character in domain. </error>
+    <error num="12601" severity="3">SBinet: could not parse proxy rule,
+    expecting a colon after proxy server name. </error>
+    <error num="12602" severity="3">SBinet: could not parse proxy rule,
+    Invalid proxy server port. </error>
+    <error num="12603" severity="3">SBinet: could not parse proxy rule,
+    Extraneous character after the port specification. </error>
+    <error num="12604" severity="3">SBinet: could not parse proxy rule, No
+    proxy server specified before the port number. </error>
+    <error num="12700" severity="2">SBinet: SSL operation failed. </error>
+
+    <!-- Server Internet fetch cache errors -->
+    <error num="13100" severity="1">SBcache: Out of memory </error>
+    <error num="13101" severity="1">SBcache: Initialized twice </error>
+    <error num="13102" severity="1">SBcache: No cache directory configured
+    </error>
+    <error num="13103" severity="1">SBcache: Invalid cache directory name,
+    must be ASCII characters </error>
+    <error num="13104" severity="1">SBcache: Invalid cache total size
+    configured </error>
+    <error num="13105" severity="1">SBcache: Invalid cache entry size limit
+    configured </error>
+    <error num="13106" severity="1">SBcache: Invalid cache entry expiration
+    time (in seconds) </error>
+    <error num="13107" severity="1">SBcache: Cache entry size limit must not
+    exceed the cache total size limit </error>
+    <error num="13108" severity="1">SBcache: Invalid argument for
+    SBcacheCreateResource( ) </error>
+    <error num="13109" severity="1">SBcache: Mutex create failed </error>
+    <error num="13110" severity="1">SBcache: Mutex lock failed </error>
+    <error num="13111" severity="1">SBcache: Mutex unlock failed </error>
+    <error num="13112" severity="1">SBcache: Internal error, cache manager
+    already created </error>
+    <error num="13113" severity="1">SBcache: Configured cache directory is not
+    a directory, it is a file </error>
+    <error num="13114" severity="1">SBcache: Could not create the cache
+    directory </error>
+    <error num="13200" severity="2">SBcache: Invalid argument for Open( ) or
+    OpenEx( ) </error>
+    <error num="13201" severity="2">SBcache: Invalid argument for Close( ) or
+    CloseEx( ) </error>
+    <error num="13202" severity="2">SBcache: Invalid argument for Unlock( ) or
+    UnlockEx( ) </error>
+    <error num="13203" severity="2">SBcache: Invalid argument for Read( )
+    </error>
+    <error num="13204" severity="2">SBcache: Invalid argument for Write( )
+    </error>
+    <error num="13205" severity="2">SBcache: Cache already shut down </error>
+    <error num="13206" severity="2">SBcache: Read failed, attempted to read
+    from a stream opened for writing </error>
+    <error num="13207" severity="2">SBcache: Internal error, Read failed due
+    to file not open </error>
+    <error num="13208" severity="2">SBcache: Read failed due to an I/O error
+    </error>
+    <error num="13209" severity="2">SBcache: Write failed, attempted to write
+    to a stream opened for reading </error>
+    <error num="13210" severity="2">SBcache: Internal error, Write failed due
+    to file not open </error>
+    <error num="13211" severity="2">SBcache: Internal error, invalid cache
+    entry mode for close </error>
+    <error num="13212" severity="2">SBcache: Write failed due to an I/O error
+    </error>
+    <error num="13213" severity="2">SBcache: File open for writing a cache
+    entry failed </error>
+    <error num="13214" severity="2">SBcache: File open for reading a cache
+    entry failed </error>
+    <error num="13215" severity="2">SBcache: Internal error, invalid cache
+    entry open mode </error>
+    <error num="13216" severity="2">SBcache: Deletion of a cache entry failed
+    </error>
+    <error num="13300" severity="3">SBcache: File close failed </error>
+    <error num="13301" severity="3">SBcache: Invalid CACHE_CREATION_COST value
+    type, VXIInteger required </error>
+
+    <!-- Phoneme converter errors -->
+    <error num="14000" severity="3">Speechify phoneme converter: SAPI5
+    input phoneme not supported </error>
+    <error num="14001" severity="3">Speechify phoneme converter: Could
+    not convert a Speechify phoneme mark to a SAPI5 phoneme event </error>
+
+    <!-- Speechify Microsoft SAPI client errors -->
+    <error num="3221225473" severity="1">Speechify SAPI module error</error>
+    
+</ErrorMessages>
