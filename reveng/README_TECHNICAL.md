@@ -353,38 +353,139 @@ Duration prediction trees. One CART tree per phone label (47 total).
 Total across all 47 trees: 778 branch nodes + 825 leaf nodes.
 Leaf predictions: duration mean (range ~57..193 in local_pos units) with variance (0.017..0.31).
 
-### `ccos` (confirmed)
+### `ccos` (CONFIRMED -- detailed disassembly 2026-03-17)
 
-Boundary spectral feature table used for runtime join cost computation ("edge frames" mode).
+Boundary spectral feature table AND duration-continuity cost table used for runtime join
+cost computation on hash misses.
 
 Sub-chunks:
 
 | Sub-chunk | Size (bytes) | Content |
 |-----------|-------------|---------|
-| `labl` | 175 | `u32 n_labels=47`, then 47 × `{ u16 name_len; char[name_len] name }` |
-| `data` | 1,628,832 | `47 × 722 × 48` bytes = `47 × 722 × 12` f32 boundary vectors |
+| `labl` | 175 | `u32 n_labels=47`, then 47 x `{ u16 name_len; char[name_len] name }` |
+| `data` | 1,628,832 | `47 x 722 x 48` bytes = `47 x 722 x 12` f32 boundary vectors |
 
-**`ccos/labl`** — 47 phone label strings (last is empty):
+**`ccos/labl`** -- 47 phone label strings (last is empty):
 `aa, ae, ah, ao, aw, ax, ay, b, ch, dx, d, dh, eh, el, er, en, ey, f, g, hh, ih, ix, iy, jh, k, l, m, n, ng, ow, oy, p, pau, r, s, sh, t, th, uh, uw, v, w, xx, y, z, zh, ""`
 
-**`ccos/data`** — flat array, organized as:
+**`ccos/data`** -- flat array, organized as:
 
 ```
-47 phones × 722 entries × 12 f32s = 407,208 f32 values = 1,628,832 bytes (exact)
+47 phones x 722 entries x 12 f32s = 407,208 f32 values = 1,628,832 bytes (exact)
 ```
 
-- Each **entry** is 48 bytes = 12 f32 spectral feature values.
+- Each **entry** is 48 bytes = 12 f32 spectral feature values (4 sub-entries of 3 floats).
 - Each **phone block** contains 722 entries (361 left-boundary + 361 right-boundary, per loader).
 - **Value range**: 0.0 .. 83.308 (all in MFCC-compatible range, 99.9% in [-20, 50]).
 
-**Loader behavior** (from `SWIttsUSel.dll` disassembly at file 0x6946):
-- Allocates `96×count + 4` bytes (count=361 per phone label).
-- Loops `2×count = 722` times, advancing 48 bytes per iteration.
-- Calls a per-entry function that reads from the RIFF stream via indirect vtable call.
-- Log strings: `"Loaded %d context tables"`, `"creating mapping num_phones %d num_labels %d"`.
+**Loader (0x8E86830-0x8E869F4):**
+- Opens "ccos" chunk, then "labl" sub-chunk, then "data" sub-chunk
+- Allocates `722 * 48 + 4 = 34,660` bytes for raw data buffer per phone
+- Loop at 0x8E86920: iterates 722 times (2 x 361), calls 0x8E84130 for each entry
+- is_first_half flag: entries 0-360 are first-half, 361-721 are second-half
+- Per-entry reader at 0x8E84130: reads 4 sub-entries of 12 bytes each (total 48 bytes)
+- Raw data stored at voice[0x610]
+- Log strings: `"Loaded %d context tables"`, `"creating mapping num_phones %d num_labels %d"`
+
+**Post-processor (0x8E83160):**
+- Builds phone-to-label reverse mapping
+- Writes ccos label index into each unit's byte at offset +0x13 (runtime-only field)
+- This field is what the engine uses to look up the correct ccos boundary vectors
 
 **Feature semantics**: 12-dimensional spectral feature vector per phone boundary frame.
-Values are LPC or MFCC-derived boundary frame coefficients (confirmed by MFCC-range values and the LPC-autocorrelation style normalization in the distance computation).
+Values are LPC or MFCC-derived boundary frame coefficients (confirmed by MFCC-range
+values and the LPC-autocorrelation style normalization in the distance computation).
+
+#### Runtime behavior: hash miss fallback and gate (CONFIRMED 2026-03-17)
+
+When a hash lookup misses at 0x8E8B7E9, the fallback at 0x8E8B7F5 uses a **gated
+duration-continuity cost** (NOT direct spectral distance from the ccos chunk data):
+
+**Gate conditions** (ALL three must pass for cost computation):
+
+```asm
+0x8e8b7f5: mov eax, [ecx + 0x6c]   ; Gate1: candidate dl-like value
+0x8e8b7f8: fld [0x8e9852c]          ; push 0.0 onto FPU (default cost)
+0x8e8b7fe: cmp eax, 0x14            ; compare with 20
+0x8e8b801: jle 0x8e8b83d            ; if <= 20, skip -> cost=0.0
+
+0x8e8b803: cmp [edx+0x80], 0xf      ; Gate2: same-rec run counter
+0x8e8b80a: jge 0x8e8b83d            ; if >= 15, skip -> cost=0.0
+
+0x8e8b80c: mov esi, [edx+0x7c]      ; Gate3: predecessor dl-like value
+0x8e8b80f: cmp esi, 0x14            ; compare with 20
+0x8e8b812: jle 0x8e8b83d            ; if <= 20, skip -> cost=0.0
+; ... gate pass -> compute cost from duration table
+```
+
+**Gate pass rate: 66%** (33/50 samples). CORRECTION: earlier analysis incorrectly
+stated the gate "almost never" passes. For Mara, [ecx+0x6c] values are 105-150 (dl-like)
+which always exceeds 20. Gate3 fails for ~34% of transitions (first candidate or zeroed
+predecessor).
+
+**Gate2 controlled by voice[0x94] = ckls entry count (NOT by use_edgeframes config):**
+
+At 0x8E8B8D0-0x8E8B8F5 (after candidate accepted in Viterbi):
+- `voice[0x94] != 0` (ckls exists): cross-rec -> candidate[0x80] = 0 (passes),
+  same-rec -> candidate[0x80] = 100 (fails)
+- `voice[0x94] == 0` (no ckls): candidate[0x80] increments per same-rec run (fails at 15+)
+
+**Effect**: WITH ckls, ccos cost computed for ALL cross-rec transitions, NEVER for same-rec.
+This is intentional: same-rec transitions are free (natural continuation), cross-rec
+transitions get a duration-continuity penalty.
+
+#### Duration-continuity cost table
+
+The actual cost is a V-shaped table (NOT spectral distance from the boundary vectors).
+
+**Table structure** at ptr0[0x80]:
+```
+u32 count = 100
+i32 offset = -50
+f32[100] values
+```
+
+**Scale factor** at ptr0[0xC8] = 0.6
+
+**Index formula**: `index = [ecx+0x6c] + 50 - [edx+0x7c]` (dl_curr - dl_prev + 50)
+
+**Full 100-entry table** (V-shaped, minimum at index 49):
+```
+[  0] 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.270 10.963 10.963
+[ 10] 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963
+[ 20] 10.963 10.270 10.963  9.864 10.963 10.270 10.963  8.884  9.354  9.354
+[ 30]  8.478  8.478  8.324  7.919  7.872  7.631  7.134  7.380  6.920  6.715
+[ 40]  6.789  6.043  5.418  4.895  4.109  3.348  2.570  1.748  0.824  0.000
+[ 50]  0.218  1.302  2.154  2.879  3.491  3.942  4.237  4.517  4.723  4.989
+[ 60]  5.391  5.765  6.021  6.399  6.836  7.012  7.113  7.437  7.744  8.130
+[ 70]  8.660  9.171 10.270  9.171 10.963 10.270  9.864 10.963 10.270 10.963
+[ 80] 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963
+[ 90] 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963 10.963
+```
+
+- Index 49 = 0.000 (perfect duration match between consecutive units)
+- Index 0 and 99 = 10.963 (maximum penalty for large duration differences)
+- Final cost = 0.6 * table[index], range 0.0 to 6.578
+- Asymmetric: left side (shorter -> longer) has noisy plateau, right side (longer -> shorter)
+  rises more smoothly
+
+#### FPU flow through join cost path (0x8E8B7F8-0x8E8B854)
+
+1. 0x8E8B7F8: `fld [0x8E9852C]` pushes 0.0. FPU: [0.0, accumulated, ...]
+2. Gate fail -> jump to 0x8E8B83D with st(0)=0.0
+3. Gate pass -> 0x8E8B818: `fstp st(0)` pops 0.0. FPU: [accumulated, ...]
+4. 0x8E8B832: `fld [esp+0x48]` pushes scale(0.6), `fmul table[idx]`. FPU: [cost, accumulated]
+5. 0x8E8B83D (common): `fst [esp+0x1c]` stores join cost component,
+   `fadd [esp+0x10]` adds target cost component, `faddp st(1)` adds to accumulated total
+6. 0x8E8B854: `fcom [esp+0x18]` compares with best score so far
+
+#### Practical impact (Exp 65, 2026-03-17)
+
+**Join cost is NOT the quality bottleneck.** A Frida code cave replacing the duration
+table with real 12-dim MFCC spectral boundary distance produced byte-for-byte identical
+output at multiple scale factors. The penalty hook (50) dominates all cross-rec decisions,
+and the PRSL pool is small enough that the choice between cross-rec candidates rarely
+changes regardless of cost function.
 
 ---
 
@@ -1139,13 +1240,24 @@ UID 176310 was selected by the engine using this technique.
 shared-offset extension. Without it, they receive `MISSING_JOIN_COST=10,000` during
 Viterbi evaluation, making them extremely unlikely to be selected.
 
-### use_edgeframes mode (non-functional -- confirmed 2026-03-16)
+### use_edgeframes mode (NO-OP -- confirmed 2026-03-17)
 
-The alternative join cost mode (`use_joincache=0, use_edgeframes=1`) attempts to compute
-spectral distances at runtime from `ccos` boundary vectors instead of hash lookup. This
-mode **does not work** -- the engine fails because it requires an additional chunk or data
-structure that has not been identified. The missing resource is not `ccos` itself (which is
-present), but something else referenced during edge-frame initialization.
+The `use_edgeframes` config flag is essentially a **no-op**. Detailed disassembly of the
+config dispatch at 0x8E86E67 reveals:
+
+1. `tts.voiceCfg.use_edgeframes` -> sets voice[0x78] = 2
+2. `tts.voiceCfg.use_joincache` -> sets voice[0x78] = 1 (**OVERRIDES** edgeframes)
+3. Switch at 0x8E86EC1: mode 1 vs mode 2 only changes which **log message** is printed
+4. Both modes then execute the **same initialization code**
+
+The actual runtime behavior (whether ccos cost is computed on hash misses) is controlled
+by `voice[0x94]` (the ckls entry count), NOT by `voice[0x78]`. See the ccos gate conditions
+above. With ckls present, ccos cost is computed for all cross-rec transitions regardless
+of the use_edgeframes config setting.
+
+The earlier belief that "use_edgeframes requires an unknown chunk" was incorrect. The mode
+simply doesn't do anything different from use_joincache because the config is overridden
+and the switch only affects logging.
 
 ### Hash loader internals (confirmed 2026-03-16, updated with Frida Stalker trace)
 
@@ -1190,36 +1302,50 @@ a **compressed perfect hash** with direct indexed access, NOT a chain walk.
 - SENTINEL (0xFFFFFFFF) at empty slots causes automatic miss (never equals any valid uid)
 - **NO bounds check** on `eax` -- if `rows[uid_right] + uid_left >= n_cells`, out-of-bounds
 
-**Hash miss fallback** at `0x8E8B7F5` (expanded 2026-03-16):
+**Hash miss fallback** at `0x8E8B7F5` (CORRECTED 2026-03-17):
 ```
-0x8e8b7f5: mov eax, [ecx + 0x6c]     ; load threshold/counter field
-0x8e8b7f8: fld [0x8e9852c]            ; push 0.0 onto FPU stack (default cost)
+0x8e8b7f5: mov eax, [ecx + 0x6c]     ; Gate1: candidate dl-like value
+0x8e8b7f8: fld [0x8e9852c]            ; push 0.0 onto FPU (default cost)
 0x8e8b7fe: cmp eax, 0x14              ; compare with 20
-0x8e8b801: jle 0x8e8b83d              ; if <= 20, return 0.0 (skip ccos)
-0x8e8b803: cmp [edx+0x80], 0xf        ; check second field (>= 15?)
-0x8e8b80a: jge 0x8e8b83d              ; if >= 15, return 0.0
-0x8e8b80c: mov esi, [edx+0x7c]        ; load third field
+0x8e8b801: jle 0x8e8b83d              ; if <= 20, skip -> cost=0.0
+
+0x8e8b803: cmp [edx+0x80], 0xf        ; Gate2: same-rec run counter
+0x8e8b80a: jge 0x8e8b83d              ; if >= 15, skip -> cost=0.0
+
+0x8e8b80c: mov esi, [edx+0x7c]        ; Gate3: predecessor dl-like value
 0x8e8b80f: cmp esi, 0x14              ; compare with 20
-0x8e8b812: jle 0x8e8b83d              ; if <= 20, return 0.0
-; ... else compute ccos spectral distance (rare path)
+0x8e8b812: jle 0x8e8b83d              ; if <= 20, skip -> cost=0.0
+; gate pass -> compute cost from V-shaped duration table (see ccos section)
 ```
 
-Three conditions gate ccos computation (ALL must fail for ccos to be used):
-1. `[ecx + 0x6c] <= 20` -- almost always true, short-circuits to cost=0.0
-2. `[edx + 0x80] >= 15` -- secondary gate
-3. `[edx + 0x7c] <= 20` -- tertiary gate
+Three gate conditions (ALL must pass for cost computation):
+1. `[ecx + 0x6c] > 20` -- candidate dl-like value (Mara values 105-150: ALWAYS passes)
+2. `[edx + 0x80] < 15` -- same-rec run counter (see gate2 behavior below)
+3. `[edx + 0x7c] > 20` -- predecessor dl-like value (fails ~34% for first/zeroed pred)
 
-**Practical impact (confirmed 2026-03-16):** For Mara, virtually ALL transitions are
-hash misses (Tom's hash covers only 0.006% of possible uid pairs). Since condition 1
-is almost always satisfied, raw_cost=0.0 for all misses. Final join cost =
-`JOIN_COST_WEIGHT * 0.0 + JOIN_COST_OFFSET = 0.2` (constant). This makes join cost
-VCF tuning completely inert -- changing JOIN_COST_WEIGHT has zero effect on unit
-selection. The only functional hash mechanism is the run-potential penalty, which
-creates explicit HIGH-cost hash HITs for penalized transitions.
+**Gate pass rate: 66%** (33/50 samples). CORRECTION: The 2026-03-16 analysis stating
+the gate "almost never" passes was WRONG. Gate1 always passes for Mara (dl values
+105-150 >> 20). The gate primarily fails on Gate3 (predecessor has no dl value yet).
 
-`[ecx+0x6c]` is unidentified -- could be halfphone position counter, candidate count,
-or a voice parameter. Understanding this field could reveal how to trigger real ccos
-computation on miss, which would restore functional join costs for non-Tom voices.
+**Gate2 behavior** (controlled by `voice[0x94]` = ckls entry count):
+At 0x8E8B8D0-0x8E8B8F5, after a candidate is accepted in the Viterbi loop:
+- `voice[0x94] != 0` (ckls exists): cross-rec -> `candidate[0x80] = 0` (passes),
+  same-rec -> `candidate[0x80] = 100` (fails: 100 >= 15)
+- `voice[0x94] == 0` (no ckls): `candidate[0x80] = candidate[0x78]` (increments
+  per same-rec continuation; fails after 15+ consecutive same-rec units)
+
+This means WITH ckls, the ccos duration cost is computed for ALL cross-rec transitions
+and NEVER for same-rec transitions. This is correct behavior by design.
+
+**Cost computation** (when gate passes): uses V-shaped duration-continuity table.
+See the `ccos` chunk section above for the full 100-entry table and FPU flow.
+Final cost = 0.6 * table[dl_curr + 50 - dl_prev], range 0.0 to 6.578.
+
+**Practical impact (UPDATED 2026-03-17):** The ccos gate DOES pass for Mara, but the
+join cost is NOT the quality bottleneck. Experiment 65 (spectral join cost cave) proved
+that even replacing the duration table with real MFCC spectral distances produces
+identical output. The penalty hook (50) dominates all cross-rec decisions, and the PRSL
+pool is small enough that the choice between cross-rec candidates rarely changes.
 
 **Indexing direction CONFIRMED (2026-03-16):** `rows[uid_right]` is the base offset.
 `uid_left` is the direct index added to that base. This was confirmed by:
@@ -1227,13 +1353,16 @@ computation on miss, which would restore functional join costs for non-Tom voice
 - In-memory buffer verification (Exp 49): sentinels present at expected positions
 - Disassembly (Exp 50): single `cmp` + `jne`, no loop instruction
 
-### use_edgeframes config logic (confirmed 2026-03-16)
+### use_edgeframes config logic (CORRECTED 2026-03-17 -- NO-OP)
 
 At `0x8E86E67`, the config dispatch:
-- `use_joincache=1` overrides `use_edgeframes=2` (joincache takes priority)
-- Switch on `[ebp+0x78]` determines which mode to use
+- `tts.voiceCfg.use_edgeframes` -> sets voice[0x78] = 2
+- `tts.voiceCfg.use_joincache` -> sets voice[0x78] = 1 (**OVERRIDES** edgeframes)
+- Switch at 0x8E86EC1: mode 1 vs mode 2 only changes which log message is printed
+- Both modes execute the same initialization code
 - `"ccos"` chunk opened at `0x8E86831` (for both modes -- ccos is always loaded)
 - `ccos` is indexed by phone (47 phones x 722 entries x 12 f32), NOT by unit ID
+- **The actual gate behavior is controlled by voice[0x94] (ckls count), NOT voice[0x78]**
 
 ### Extra recordings and hash limitations (confirmed + resolved 2026-03-16)
 
@@ -2254,6 +2383,51 @@ does NOT read `total_score`. Only 31-37% of pre-prune best UIDs match the actual
 To capture the true path, hook `SWIttsWsolaConcat` and read the unit list from arg4. See
 `c:/tmp/diag_ground_truth.py` for implementation.
 
+### Viterbi NoJoin inner loop (disassembled 2026-03-17)
+
+The active Viterbi for Mara is at `0x8E8B620` (NoJoin variant, since hash misses dominate).
+
+**Candidate struct fields used by Viterbi:**
+| Offset | Type | Field | Description |
+|--------|------|-------|-------------|
+| `+0x0C` | `u32` | `uid` | Used as hash row index (`rows[uid]`) and adjacency check |
+| `+0x10` | `u32` | `uid_alt` | Used as hash cell index (predecessor lookup) |
+| `+0x20` | `f32` | `cum_score` | Accumulated path cost (Viterbi state) |
+| `+0x24` | `ptr` | `predecessor` | Pointer to best predecessor candidate |
+| `+0x2C` | `f32` | `initial_cost` | Target cost from scorer (copied to +0x20 in init loop) |
+
+**Adjacency check** at `0x8E8B854`:
+```asm
+cmp ebx, eax       ; ebx = candidate.uid, eax = predecessor.uid_alt + 1
+jne 0x8E8B862      ; if not adjacent -> normal path (apply join cost)
+; Adjacent -> FREE transition: join=0, context=0
+```
+This is the ONLY mechanism for same-recording preference in the Viterbi. It checks
+`candidate.uid == predecessor.uid + 1`, which is true for consecutive halfphones within
+the same recording (UIDs are sequential per recording in the unit table).
+
+**Hookable for recording-switch penalty:** The 7-byte `cmp/jne` at 0x8E8B854 can be
+replaced with `jmp cave` (5 bytes + 2 nops). The cave adds a penalty to the FPU stack
+when file_idx differs between candidate and predecessor. See Exp 56.
+
+### Candidate pruning pipeline (confirmed 2026-03-17)
+
+The scoring-to-Viterbi pipeline has a critical pruning step:
+
+1. PRSL returns ~50-200 raw candidates per halfphone position
+2. InnerScorer (`0x8E88DE0`) computes target cost for each candidate
+3. Prune (`0x8E88830`) removes candidates with total_score >= `HALFPHONE_CAND_PRUNE_THRESH`
+   (VCF parameter, Tom default = 0.95, effective with Mara at 0.8)
+4. Post-prune survivors (~5-14 per position) are copied to HP candidate objects
+5. Viterbi reads only from HP candidate objects (`[hp+0x34]` pointer array)
+
+**Prune threshold is the recording-switch bottleneck:** With prune=0.8, only ~14 candidates
+survive per position. Among these, very few share recordings at adjacent positions (3.3%
+of Viterbi transitions are same-rec). Raising prune to 3.0 lets more candidates through,
+increasing same-rec transitions to 0.7% of a much larger pool (320K transitions) and
+reducing switches from 32 to 29. But prune=10.0 (effectively disabled) degrades audio
+quality by letting phonetically wrong candidates dominate.
+
 ---
 
 ## VDB Recording Structure (confirmed 2026-03-15)
@@ -2289,3 +2463,7 @@ in Mara's recordings and should be disabled (`dl=0`).
 - Whether the engine also has a "same-recording penalty" that discourages switching recordings
   mid-word (the complement of the continuation reward). If so, tuning this via DLL or VCF
   would be an alternative to hash cost manipulation.
+- **ANSWERED (2026-03-17):** The engine has NO built-in recording-switch penalty. The ONLY
+  same-recording preference is the uid adjacency check at `0x8E8B854` (free transition for
+  uid == prev_uid + 1). A Frida code cave at this address can add a penalty (Exp 56), but
+  the prune threshold (Exp 59) has more impact than penalty magnitude.

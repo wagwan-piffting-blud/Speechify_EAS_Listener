@@ -873,6 +873,556 @@ made to fail (> 20), more transitions would get real spectral costs instead of 0
 
 ---
 
+## Experiment 55: Viterbi Forward Pass Disassembly (2026-03-17)
+
+**Goal:** Fully understand the Viterbi inner loop to find hookable points for
+recording-switch reduction.
+
+**Method:** Capstone disassembly of three key functions in SWIttsUSel.dll:
+- `0x8E8EDD0` -- Viterbi forward pass (with join cost)
+- `0x8E8ED20` -- Join cost calculator
+- `0x8E8B620` -- "NoJoin" Viterbi (the one actually used by Mara, since hash misses)
+
+**Findings:**
+The NoJoin Viterbi at `0x8E8B620` is the active code path for Mara. Key structure:
+```
+Outer loop: for each HP position i = 1..N-1:
+  esi = HP[i] candidate list
+  [esi+0x2c] = candidate count
+  [esi+0x34] = pointer array to candidate objects
+
+  Inner loop: for each candidate c at position i:
+    ecx = candidate_ptr (from [esi+0x34][j*4])
+    ebx = candidate uid (from [ecx+0x0c])
+
+    Predecessor loop: for each candidate p at position i-1:
+      edx = predecessor_ptr
+      [edx+0x10] = predecessor uid_alt
+      [edx+0x20] = predecessor cum_score
+
+      Hash lookup: cell[rows[ebx] + [edx+0x10]]
+        HIT -> join_cost = cell.cost_f32
+        MISS -> join_cost = 0.0 (via fallback at 0x8E8B7F5)
+
+      Adjacency check at 0x8E8B854:
+        if candidate.uid == predecessor.uid + 1:
+          join_cost = 0, context_cost = 0 (FREE transition)
+
+      new_cum = predecessor.cum_score + join_cost + context_cost
+      if new_cum < candidate.best_cum:
+        candidate.cum_score = new_cum
+        candidate.predecessor = p
+```
+
+**Critical discovery:** The adjacency check at `0x8E8B854` (`cmp ebx, eax; jne`)
+is the ONLY point where same-recording transitions get preferential treatment.
+This is a pure UID adjacency check (uid == prev_uid + 1), not a recording check.
+
+---
+
+## Experiment 56: Viterbi Penalty Hook (2026-03-17)
+
+**Goal:** Add a recording-switch penalty to the Viterbi inner loop via Frida code cave.
+
+**Method:** Patch the adjacency check at `0x8E8B854` to jump to a code cave that:
+1. Loads file_idx for both candidate and predecessor from a lookup table
+2. If file_idx differs (recording switch), adds penalty to join cost via `fadd`
+3. Falls through to the original adjacency check
+
+**Hook location:** `0x8E8B854` (7-byte `cmp ebx,eax; jne` -> `jmp cave; nop nop`)
+
+**Results:**
+
+| Penalty | Switches | Run mean | Run max | Notes |
+|---------|----------|----------|---------|-------|
+| 0 (baseline) | 40 | 2.3 | 10 | No hook |
+| 50 | 32 | 2.9 | 10 | First improvement |
+| 100 | 32 | 2.9 | 10 | Saturated |
+| 200 | 32 | 2.9 | 10 | Saturated |
+| 500 | 32 | 2.9 | 10 | Saturated |
+
+**Conclusion:** Penalty saturates at p=50 (32 switches). The penalty can only choose
+among candidates that survive pruning. With ~14 post-prune candidates per position,
+too few share recordings at adjacent positions for the penalty to help further.
+
+---
+
+## Experiment 57: Theoretical Minimum Recording Switches (2026-03-17)
+
+**Goal:** Compute the absolute minimum number of recording switches for the test
+sentence, ignoring all costs except recording identity.
+
+**Method:** Dijkstra on a recording-level graph:
+- Nodes: (hp_position, file_idx)
+- Edges: cost 0 if same file_idx, cost 1 if different
+- Candidate pool: ALL prsl candidates with matching phone_center (not context-filtered)
+
+**Results:**
+- **Theoretical minimum: 2 switches** (for 100 halfphones)
+- 3 recordings cover the entire sentence:
+  - `news09_035` (fidx 2106): HPs 1-28
+  - `news32_047` (fidx 4520): HPs 29-64
+  - `news7_032` (fidx 4905): HPs 65-100
+- **Every boundary (99/99) has same-recording transitions available**
+- Gap from theoretical (2) to actual (32) = the candidate pool bottleneck
+
+---
+
+## Experiment 58: Runtime Candidate Injection via Frida (2026-03-17)
+
+**Goal:** Inject candidates from high-coverage recordings into the Viterbi candidate
+lists at runtime, combined with the penalty hook.
+
+**Method:** Two approaches tried:
+1. **Pre-scorer injection** (hook inner scorer onEnter, replace last N candidates):
+   Injected candidates scored by engine but then PRUNED (total_score > 0.95 threshold).
+   Result: 32 switches (unchanged).
+2. **Post-prune injection** (hook prune onLeave, append candidates after pruning):
+   Appended candidates with copied template scores. Same-rec transitions 4x'd (577->2268)
+   but Viterbi still selected 32 switches -- injected candidates had wrong component scores.
+
+**Conclusion:** Runtime injection doesn't work because:
+- Pre-scorer: candidates get pruned (wrong triphone context = high target cost)
+- Post-prune: candidates have wrong component scores (copied from template unit)
+The engine's scoring pipeline must evaluate candidates naturally.
+
+---
+
+## Experiment 59: PRSL + Prune Threshold Tuning (2026-03-17)
+
+**Goal:** Add target-recording UIDs to PRSL at build time so they go through the
+full scoring pipeline, combined with relaxed prune threshold.
+
+**Method:**
+1. Modified `build_mara_rest.py` to inject 301 UIDs from 3 target recordings
+   (news09_035, news32_047, news7_032) into every relevant PRSL context group.
+   669,207 target_rec candidates added across 86,731 groups.
+2. Raised `HALFPHONE_CAND_PRUNE_THRESH` in VCF from 0.8 to various values.
+3. Raised `HALFPHONE_CAND_MAX_UNITS` from 50 to 200.
+
+**Results:**
+
+| Prune | Penalty | Switches | Transitions | Audio quality |
+|-------|---------|----------|-------------|---------------|
+| 0.8 | 50 | 32 | 17K | Stuttery but improved |
+| 3.0 | 50 | **29** | 320K | Better, stutter reduced |
+| 3.0 | 10 | 30 | 318K | Nearly identical to p=50 |
+| 10.0 | 50 | **24** | 448K | Bad -- "Waysether today..." |
+
+**Key findings:**
+- **Prune threshold is the bottleneck**, not penalty magnitude (p=50 vs p=10 = 1 switch)
+- prune=3.0 is the sweet spot: 29 switches with acceptable audio quality
+- prune=10.0 reaches 24 but lets garbage candidates dominate (wrong phones selected)
+- Same-rec % actually DROPS with more candidates (0.7% at 320K vs 3.3% at 17K) --
+  more candidates = more total transitions but same-rec count doesn't scale proportionally
+
+**Best config found:** prune=3.0, MAX_UNITS=200, penalty=50 = **29 switches** (was 40)
+
+---
+
+## Experiment 60: Transcript Reconstruction from ckls (2026-03-17)
+
+**Goal:** Programmatically reconstruct full transcripts for all Tom recordings using
+the ckls word records as ground truth, to improve Mara re-synthesis quality.
+
+**Background:** Tom's VDB recordings are pre-cut fragments with unlabeled portions.
+Manual transcription (basis for current Mara audio) misidentified many words because
+the source audio has mid-word cuts. ASR (Whisper, faster-whisper, Meta model) all
+failed on the 8kHz u-law fragments.
+
+**Method:**
+1. Parse Tom's ckls chunk for _WORD_ records (word -> span_start/span_end -> file_name)
+2. Cross-reference with unit table phone sequences per recording
+3. Use ckls words as anchors to correct old transcripts via SequenceMatcher alignment
+
+**Results:**
+- 2,816 recordings have ckls word labels (out of 8,118 total filenames)
+- 2,111 confirmed correct (ckls validates old transcript)
+- 671 corrected (ckls fixed specific misheard words)
+- 3,472 kept as-is (no ckls coverage)
+- 1,830 empty (no transcript)
+
+**Example corrections:**
+| Recording | Old (misheard) | Corrected (ckls truth) |
+|-----------|----------------|----------------------|
+| date_063 | "nine" | "ninth" |
+| dip1_033 | "twin" | "when" |
+| dip2_069 | "ian been after that" | "and after that" |
+| dip2_090 | "we watched the" | "we watched out" |
+| dip3_020 | "enjoy it sure" | "enjoy shore" |
+
+**Output:** `c:\tmp\resynth_final.csv` (6,288 recordings ready for Qwen re-synthesis)
+
+---
+
+## Experiment 61: Audio Trim v1 -- First-Half Only (2026-03-17)
+
+**Goal:** Trim Mara recordings to match Tom's VDB fragment structure, removing
+audio before/after the phone regions actually used by VIN units.
+
+**Method:** Computed trim boundaries from first-half phone alignment only.
+Trimmed WAVs, rebuilt VDB + VIN with trimmed audio.
+
+**Results:**
+- 5,474 recordings trimmed to avg 51% of original (3,675 sec saved)
+- FAILED: caused mass dl=1 artifacts because trim only used first-half phones
+- Cutting removed audio needed by second-half units
+- 42 switches (worse than 40 baseline)
+
+**Root cause:** Trim boundaries must account for ALL halfphone units (both halves),
+not just the first-half phone sequence.
+
+---
+
+## Experiment 62: Audio Trim v2 -- All Halves (2026-03-17)
+
+**Goal:** Fix trim to use ALL unit positions (both halves) for trim boundaries.
+
+**Method:** Computed trim boundaries from ALL units in each recording (both first-half
+and second-half). More conservative trim. Rebuilt with fresh MFA alignment on trimmed WAVs.
+
+**Results:**
+- 3,876 recordings trimmed to avg 68% of original (1,729 sec saved)
+- No dl=1 artifacts
+- 37 switches baseline (40 -> 37, 3 fewer from trim alone)
+- Required fresh MFA alignment on trimmed WAVs
+
+**Key insight:** Trim ensures VDB audio content matches what the engine's lp/dl
+offsets expect. Even without penalty hooks, quality improves because unit boundaries
+point to correct audio regions.
+
+---
+
+## Experiment 63: VDB Bounds Safety Clamp (2026-03-17)
+
+**Goal:** Fix VDB corruption crash caused by post-processing pushing units past
+recording bounds.
+
+**Problem:** Post-processing steps (dl inflation, gap-closing, monotonicity enforcement)
+pushed 12,580 units past recording bounds, causing "File end is beyond speech DB end"
+crash at engine load time.
+
+**Fix:** Added final safety clamp after ALL post-processing steps, ensuring
+lp+dl <= cap for every unit. STATE_VERSION bumped to 76.
+
+**Key insight:** Post-processing invariants must be enforced AFTER all transformations,
+not just after the initial mapping pass.
+
+---
+
+## Experiment 64: Full Stack -- Trim v2 + Penalty + PRSL + Prune (2026-03-17)
+
+**Goal:** Combine ALL improvements into a single configuration.
+
+**Method:** Combined:
+- Audio trim v2 (all-halves boundaries)
+- Fresh MFA alignment on trimmed WAVs
+- VDB bounds safety clamp (STATE_VERSION 76)
+- PRSL target recording injection (669K candidates)
+- VCF: HALFPHONE_CAND_PRUNE_THRESH=3.0, HALFPHONE_CAND_MAX_UNITS=200
+- Frida penalty hook at 0x8E8B854 with p=50
+
+**Results:**
+- **29 switches** with dramatically improved audio quality
+- User assessment: "This one sounds damn good. Like, REALLY damn good. It's working."
+- Trim ensures audio content matches what engine expects (content quality)
+- Penalty/prsl/prune reduces recording switches (selection quality)
+- Together they solve both the content mismatch AND the switching problems
+- Neither improvement alone is sufficient -- both are required
+
+---
+
+## Experiment 65: Spectral Join Cost Cave (2026-03-17)
+
+**Goal:** Replace the duration-table join cost with real 12-dim MFCC spectral boundary
+distance via Frida code cave, to improve cross-recording transition quality.
+
+**Method:**
+1. Built `mara_spectral.bin` sidecar file: 16.3 MB, 169,579 units x 12 floats x 2
+   (left boundary + right boundary MFCCs)
+2. Generated by `build_mara_spectral.py` in ~3 seconds (reuses build_mara_hash.py spectral code)
+3. Frida code cave at 0x8E8B814: 251 bytes of unrolled x86 FPU code computing
+   `sqrt(sum((right_boundary[i] - left_boundary[i])^2))` across 12 MFCC dimensions
+4. Cave replaces the gate-pass path (after all 3 gate conditions pass)
+
+**Results:**
+- scale=0.089: No quality change. **Byte-for-byte identical output** to penalty-only.
+- scale=1.0: Same output hash.
+- scale=10.0: Same output hash (12,990 spectral hits confirmed).
+- Verified cave IS executing: 2,155 spectral hits at default scale.
+- Verified cave DOES affect FPU: constant 999.0 produces different output hash.
+
+**Analysis:**
+The penalty hook (50) dominates all cross-rec decisions. The join cost only matters when
+choosing BETWEEN cross-rec candidates at the same HP position. But the PRSL pool is small
+enough that the choice between cross-rec candidates rarely changes regardless of cost
+function. The penalty pushes strongly toward same-rec, and among the few cross-rec options
+available at each position, the spectral distance doesn't differentiate enough to change
+the Viterbi path.
+
+**CONCLUSION: Join cost is NOT the quality bottleneck.** Further investment in join cost
+refinement (spectral, duration-based, or otherwise) will not improve output quality.
+The bottleneck is elsewhere -- likely source audio consistency across recordings.
+
+---
+
+## Experiment 66: CCOS Gate Investigation (2026-03-17)
+
+**Goal:** Fully understand the hash miss fallback gate at 0x8E8B7F5 to determine whether
+ccos join cost is actually computed for Mara.
+
+**Method:** Detailed disassembly of the gate conditions, runtime sampling with Frida,
+and tracing the gate2 update logic after candidate acceptance.
+
+**Findings -- CRITICAL CORRECTIONS to prior understanding:**
+
+1. **Gate passes 66% of hash misses** (33/50 samples), NOT "almost never" as assumed.
+   The earlier analysis that condition 1 ([ecx+0x6c]>20) "almost always fails" was WRONG.
+   For Mara's units, [ecx+0x6c] values are 105-150 (dl-like), which always exceeds 20.
+
+2. **Gate conditions:**
+   - Gate1: `[ecx+0x6c] > 20` -- candidate dl-like (ALWAYS passes for Mara)
+   - Gate2: `[edx+0x80] < 15` -- same-rec run counter
+   - Gate3: `[edx+0x7c] > 20` -- predecessor dl-like
+
+3. **Gate2 is controlled by voice[0x94] = ckls entry count, NOT by use_edgeframes config:**
+   At 0x8E8B8D0-0x8E8B8F5 (after join cost computed, candidate accepted):
+   - WITH ckls (Mara has it): cross-rec -> candidate[0x80]=0 (passes), same-rec -> 100 (fails)
+   - WITHOUT ckls: candidate[0x80] increments per same-rec continuation (fails after 15+)
+   This is PERFECT behavior: ccos cost computed for ALL cross-rec, NEVER for same-rec.
+
+4. **Cost table is V-shaped duration-continuity curve, NOT flat:**
+   - 100 entries, offset=-50, index = dl_curr + 50 - dl_prev
+   - Index 49 = 0.000 (perfect match), edges = 10.963 (maximum)
+   - Scale factor = 0.6 (from ptr0[0xC8])
+   - Final cost range: 0.0 to 6.578
+
+5. **use_edgeframes is a NO-OP:**
+   - Config dispatch at 0x8E86E67 sets voice[0x78]=2 for edgeframes, then use_joincache
+     overwrites to voice[0x78]=1
+   - Switch at 0x8E86EC1: mode 1 vs 2 only changes log message text
+   - Both modes execute identical initialization code
+   - Actual gate behavior controlled by voice[0x94], not voice[0x78]
+
+**CONCLUSION:** The ccos gate works correctly for Mara. It provides a V-shaped duration
+cost for cross-rec transitions. However, per Exp 65, this cost doesn't improve quality
+because the penalty hook dominates all cross-rec decisions.
+
+See `discovery_ccos_gate.md` for full disassembly, FPU flow, and cost table values.
+
+---
+
+## Experiment 67: RVC Voice Normalization (2026-03-17) -- SUCCESS (partial)
+
+**Goal:** Use RVC (Retrieval-based Voice Conversion) as a post-processing normalizer
+to reduce voice inconsistency across Qwen-synthesized recordings.
+
+**Problem:** Qwen3-TTS synthesizes each recording independently, producing inconsistent
+prosody, pitch, and speaking rate across recordings. This causes audible "stutter" at
+concatenation points even with perfect join costs, because the underlying voice character
+changes at every recording boundary.
+
+**Method:**
+1. `find_best_mara_wavs.py` (c:/tmp/) selects top 106 WAVs (~8 min) by quality metrics:
+   duration > 2.5s, speech ratio > 50%, no clipping, stable RMS
+2. Train RVC model on curated WAVs using `rvc-no-gui` CLI tool:
+   - model_name=mara, 500 epochs, RTX 4070 Ti Super
+   - Training on QWEN OUTPUTS (not original NWR audio) teaches RVC "what consistent
+     Mara should sound like"
+3. Batch-convert all 5,745 synth WAVs through trained RVC model (0 failures, ~2 hours)
+4. Then: trim -> MFA -> build pipeline as usual
+
+**Results:**
+- **Cross-recording stutter is SOLVED.** Transitions between recordings are seamless.
+- RVC normalizes timbre/pitch/rate across all recordings
+- Mean spectral correction dropped from 4.5 dB to 3.3 dB (more consistent source audio)
+- Phantom phonemes remain (content quality issue from Qwen transcripts, not transition quality)
+
+**Key insight:** The quality bottleneck is not join cost (Exp 65 proved this) but
+source audio consistency. RVC normalizes voice characteristics (timbre, pitch range,
+speaking rate) across all recordings, addressing the ROOT CAUSE of concatenation artifacts.
+Training on Qwen outputs (not clean reference) is key -- it learns Mara's actual voice.
+
+**IMPORTANT LIMITATION (discovered Exp 69):** RVC trained on Qwen outputs works well for
+Qwen->Mara conversion (similar input domain), but raw 8kHz Tom->Mara conversion produces
+robotic output ("Terminator chainsmoker"). The 8kHz u-law source quality is too low for
+convincing voice conversion. AudioSR upscaling (Exp 69) fixes this.
+
+---
+
+## Experiment 68: RVC + Trim v2 + Penalty Full Stack (2026-03-18)
+
+**Goal:** Combine RVC-normalized audio with the full build pipeline (trim v2, MFA,
+penalty hook, PRSL injection, prune) to get the best possible output quality.
+
+**Method:**
+1. RVC-normalized WAVs from Exp 67
+2. Trim v2 on RVC output (3,082 recordings trimmed, 1,390 sec saved)
+3. Fresh MFA alignment on trimmed RVC WAVs
+4. Full build: `build_voice_pipeline.py mara --wav-dir resynth_rvc_trimmed --tg-dir resynth_rvc_trimmed`
+5. Penalty hook p=50, PRSL injection, prune=3.0
+
+**Results:**
+- **31 recording switches** (vs 33 without trim, 29 best ever with non-RVC audio)
+- Transitions are seamless (RVC solved cross-rec stutter)
+- Mean spectral correction: 3.7 dB (down from 4.5 pre-RVC)
+- Similar-recording pairs: 691,987 (up from 632K pre-RVC)
+- User assessment: "comprehensible, an improvement" but phantom phonemes remain
+
+**Remaining artifacts heard by user:**
+- "weatherthem" -- excess content in recording (transcript issue)
+- "cloudy-e" -- trailing phoneme at recording boundary (trim not aggressive enough)
+- "(SE)venty" with Tom's voice leaking through (coverage gap, no Mara recording)
+- "degrees?" with wrong intonation (Qwen prosody mismatch)
+
+**Analysis:** RVC solves the transition quality problem completely, but content quality
+issues remain: phantom phonemes from over-long recordings, coverage gaps (~1,830
+recordings with no Mara audio), and Qwen prosody mismatches. These are source content
+problems, not pipeline problems.
+
+---
+
+## Experiment 69: AudioSR Upscaling + RVC "Voice Skin" Pipeline (2026-03-18)
+
+**Goal:** Instead of re-recording Mara audio with Qwen (which has transcript/prosody
+issues), use Tom's original 8kHz u-law audio as the source, upscale it to high quality
+with AudioSR, then convert to Mara's voice with RVC. This is the "voice skin" approach:
+keep Tom's entire phonetic structure (lp, dl, unit positions), swap just the voice timbre.
+
+**Problem:** Direct Tom 8kHz -> RVC produces robotic output (Exp 67 limitation). The
+8kHz u-law source quality is too low for convincing male->female voice conversion.
+
+**Method:**
+1. Decode Tom's 8kHz u-law VDB audio to PCM WAV (one WAV per recording)
+2. AudioSR upscale: speech model, ddim_steps=20, guidance_scale=3.5 -> 48kHz WAV
+   - Batch script: `c:/tmp/audiosr_batch.py` (processes all 6,849 recordings)
+   - Speed: ~2-3 seconds/file on RTX 4070 Ti Super (~4-6 hours total)
+3. RVC convert upscaled audio: Mara model, 8 threaded workers (~0.8 files/s/worker)
+   - Batch script: `c:/tmp/rvc_batch.py`
+4. Build with `build_voice_pipeline.py` using RVC output as WAV source
+   - No MFA needed (Tom's lp/dl values are already correct)
+   - No trimming needed (Tom's recordings are already proper length)
+   - No transcript corrections needed (Tom's audio has perfect phone content)
+
+**Key findings:**
+- AudioSR upscaled audio sounds "extremely crisp" per user evaluation
+- This eliminates ALL content quality problems from the Qwen approach:
+  - No phantom phonemes (Tom's audio matches Tom's transcripts perfectly)
+  - No coverage gaps (all 6,849 recordings have audio)
+  - No prosody mismatches (Tom's prosody IS the engine's expected prosody)
+- The only variable is RVC conversion quality on upscaled male->female
+
+**Results:**
+- 6,606 recordings processed via AudioSR + RVC pipeline
+- 243 short recordings failed AudioSR (too short for diffusion model block size)
+  - These were handled via direct RVC on raw 8kHz Tom audio (Exp 71)
+- All 6,849 Tom recordings now have Mara audio -- zero Tom leaks
+- **28 recording switches** without penalty hook
+- **24 recording switches** with penalty hook (p=50)
+- Pitch: 176.1 Hz output (target 175.7 Hz, 0.0 semitone error)
+- User assessment: **"CLEAN CLEAN CLEAN"**
+- build_voice_skin.py is the primary build tool for this approach
+
+**STATUS:** SUCCESS -- Mara voice COMPLETE
+
+---
+
+## Experiment 70: True Mara RVC Model (mara_v2) (2026-03-18)
+
+**Goal:** Train RVC on real Mara recordings (NWR corpus, 2003-2016) instead of
+Qwen-synthesized outputs, to get a more authentic Mara voice character.
+
+**Method:**
+1. Collected 5 min 18 sec of real NWR Mara recordings as training data
+2. Trained RVC model (mara_v2.pth): 500 epochs
+3. f0up_key=8 (verified: 176.1 Hz output vs 175.7 Hz reference)
+
+**Results:**
+- loss_mel settled at 18-19 (higher than Qwen model's 10.7 due to bandwidth-limited source)
+- Produces authentic "radio-like" Mara voice (bandwidth-limited, as expected from
+  2003-2016 recordings -- source audio was never wideband)
+- Model: mara_v2.pth
+
+**STATUS:** SUCCESS -- alternative model available for authentic Mara character
+
+---
+
+## Experiment 71: Tom Leak Fix (Short Recording Fallback) (2026-03-18)
+
+**Goal:** Eliminate Tom's male voice leaking through on short recordings (letters
+like "A", "P", "I") that failed AudioSR upscaling.
+
+**Problem:** 243 short recordings were too short for AudioSR's diffusion model block
+size, so they had no Mara audio. When the engine selected units from these recordings,
+Tom's male voice leaked through.
+
+**Method:**
+1. Extract short recordings from Tom VDB
+2. Run RVC directly on raw 8kHz audio (skip AudioSR step)
+3. Slightly lower quality than AudioSR+RVC but eliminates male voice leakage
+
+**Results:**
+- All 243 short recordings now have Mara audio
+- Total coverage: 6,849/6,849 recordings (100%)
+- Quality is acceptable -- these are short phonemes where AudioSR quality
+  matters less than voice identity
+
+**STATUS:** SUCCESS -- zero Tom leaks remaining
+
+---
+
+## Current status (2026-03-18 FINAL)
+
+### Recording switches progress
+| Configuration | Switches | Method |
+|--------------|----------|--------|
+| Baseline (no hooks) | 40 | -- |
+| Trim v1 (first-half only) | 42 | FAILED -- dl=1 artifacts |
+| Trim v2 (all halves) | 37 | Trim alone, no hooks |
+| Penalty hook (p=50) | 32 | Frida code cave at 0x8E8B854 |
+| + PRSL injection + prune=3.0 | 29 | build_mara_rest.py + VCF |
+| Full stack (trim v2 + all) | **29** | Best quality, user-approved |
+| Spectral join cost cave | **29** | No change (Exp 65) |
+| RVC + penalty (no trim) | 33 | Seamless transitions |
+| RVC + trim v2 + full stack | **31** | Seamless, some phantoms |
+| Voice skin (True Mara v2) | **28 / 24** | 28 raw, 24 with hook (Exp 69) |
+| Theoretical minimum | 2 | Dijkstra on recording graph |
+
+### Final config (2026-03-18 -- PROJECT COMPLETE)
+- **Voice skin approach (Exp 69):** Tom 8kHz u-law -> AudioSR 48kHz -> RVC (f0up_key=8) -> build_voice_skin.py
+- 6,606 recordings via AudioSR+RVC, 243 short recordings via direct RVC fallback (Exp 71)
+- All 6,849 recordings covered -- zero Tom leaks
+- Two RVC models: mara.pth (Qwen-trained), mara_v2.pth (True Mara NWR-trained, Exp 70)
+- VCF: `HALFPHONE_CAND_PRUNE_THRESH=3.0`, `HALFPHONE_CAND_MAX_UNITS=200`
+- Frida penalty hook: p=50 at 0x8E8B854
+- Pitch: 176.1 Hz (target 175.7 Hz, 0.0 semitone error)
+- User assessment: **"CLEAN CLEAN CLEAN"**
+- VOICE_CLONING.md documents the full pipeline for anyone to follow
+
+### Build pipeline consolidation (2026-03-18)
+- Created `build_voice_pipeline.py` (3,374 lines) consolidating all 5 build_mara_*.py scripts
+- `build_voice_skin.py` is the primary tool for the voice skin approach
+- Parameterized: supports mara, craig, or any new voice name
+- Created `requirements.txt` (numpy, scipy, pyworld, tqdm, psutil)
+
+### Key technical discoveries (full project)
+- **Voice skin approach** (AudioSR + RVC) eliminates ALL Qwen content problems
+- **RVC trained on Qwen outputs** normalizes voice consistency without clean reference
+- **True Mara RVC (mara_v2)** trained on real NWR recordings produces authentic character
+- **Cross-recording stutter SOLVED** by RVC normalization (Exp 67)
+- **Raw 8kHz Tom -> RVC = robotic** ("Terminator chainsmoker"); AudioSR upscaling fixes this
+- **Join cost is NOT the quality bottleneck** (Exp 65: spectral cave = identical output)
+- **ccos gate passes 66%** of hash misses; V-shaped duration-continuity curve
+- **use_edgeframes is a NO-OP** (voice[0x78] overridden; gate2 from voice[0x94]=ckls count)
+
+### Project status: COMPLETE
+- Mara voice working, pipeline documented in VOICE_CLONING.md
+- Craig voice is next (same pipeline, new RVC model)
+- All reverse engineering goals achieved: VIN/VDB/VCF formats fully understood
+- Build pipeline proven and repeatable for new voices
+
+---
+
 ## Current status (2026-03-16 end of session, updated)
 
 ### Build pipeline (STATE_VERSION 70)

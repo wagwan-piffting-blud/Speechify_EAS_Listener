@@ -392,6 +392,65 @@ At `0x8E86E67`:
 - `"ccos"` chunk opened at `0x8E86831` regardless of mode
 - `ccos` is phone-indexed (47 phones x 722 entries x 12 f32), NOT unit-indexed
 
+### Viterbi Forward Pass (NoJoin) -- disassembled 2026-03-17
+
+Function `0x8E8B620` -- the active Viterbi path for Mara (hash misses -> no join cost).
+
+**Structure:**
+```
+Init loop (0x8E8B662): for each candidate at position 0:
+  [cand+0x20] = [cand+0x2c]   // cum_score = initial target cost
+  [cand+0x24] = 0              // no predecessor
+
+Forward pass (0x8E8B6E8): for each position i = 1..N-1:
+  esi = HP[i] from [edi+0x18][i*4]
+  candidate count = [esi+0x2c]
+  candidate ptrs = [esi+0x34]
+
+  Inner loop: for each candidate c at position i:
+    ecx = [esi+0x34][j*4]
+    ebx = [ecx+0x0c]            // candidate uid
+
+    Predecessor loop: for each predecessor p at position i-1:
+      edx = predecessor_ptr
+      eax = [edx+0x10]          // predecessor uid_alt
+
+      // Hash lookup
+      cell_idx = rows[ebx] + eax
+      if cell[cell_idx].key == eax: HIT (use cell cost)
+      else: MISS -> join_cost = 0.0
+
+      // Adjacency check at 0x8E8B854
+      if ebx == eax + 1:
+        join_cost = 0, context_cost = 0  (FREE same-unit transition)
+
+      new_cum = [edx+0x20] + join_cost + context_cost
+      if new_cum < [ecx+0x20]:
+        [ecx+0x20] = new_cum
+        [ecx+0x24] = edx        // predecessor pointer
+```
+
+**Hookable points for recording-switch penalty:**
+- `0x8E8B854`: adjacency check (`cmp ebx,eax; jne`) -- 7 bytes, patchable to `jmp cave`
+- Cave writes penalty via `fadd` on FPU stack before the cmp, only when file_idx differs
+- Penalty saturates at p=50 (40->32 switches) due to candidate pool limitation
+
+### Candidate Pipeline (scoring -> pruning -> Viterbi)
+
+The full pipeline from PRSL to Viterbi:
+1. **PRSL lookup** (`0x8E89A70`): returns candidate UIDs for triphone context key
+2. **BuildCandidateList**: creates flat 0x18-byte candidate entries
+3. **InnerScorer** (`0x8E88DE0`): scores all candidates (target cost from unit properties)
+4. **Prune** (`0x8E88830`): removes candidates with total_score >= threshold (VCF param)
+   - Object: `[ecx+0x14]` = pre-prune count, `[ecx+0x18]` = flat array, `[ecx+0x00]` = post-prune count
+5. **PostScoringAdj** (`0x8E8D210`): copies survivors to HP candidate objects
+6. **Viterbi** (`0x8E8B620`): reads from `[hp+0x34]` pointer array with count `[hp+0x2c]`
+
+**Key insight (Exp 58-59):** Runtime injection after prune step does NOT propagate to
+the Viterbi's pointer-array structure. Only candidates that go through the full pipeline
+(steps 1-5) appear in the Viterbi. This is why PRSL build-time injection (Exp 59) works
+but Frida runtime injection (Exp 58) doesn't.
+
 ### Extra Recording Evaluation -- confirmed 2026-03-16
 
 Frida diagnostic (`diag_extra_selection`) confirmed:

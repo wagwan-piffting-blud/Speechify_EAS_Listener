@@ -1,0 +1,7 @@
+numpy
+scipy
+pyworld
+tqdm
+psutil
+frida
+frida-tools

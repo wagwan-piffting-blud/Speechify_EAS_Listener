@@ -81,16 +81,16 @@
   </param>
 
   <param name="tts.voice.name">
-     <value> tom </value> <!-- can be one of tom, jill, felix, javier, paulina; language folder voice data is stored in must match below -->
+     <value> tom </value> <!-- can be one of aimara, aimara2, tom, jill, felix, javier, paulina; language folder voice data is stored in MUST match below -->
   </param>
 
   <param name="tts.voice.format">
      <value> 8 </value>
-     <!-- <value> 16 </value> -->
+     <!-- <value> 16 </value> --> <!-- ONLY UNCOMMENT if you have a 16 kHz vdb available -->
   </param>
 
   <param name="tts.voice.language">
-     <value> en-US </value> <!-- can be one of en-US, es-MX, or fr-CA, case sensitive -->
+     <value> en-US </value> <!-- can be one of en-US, es-MX, or fr-CA, case sensitive! -->
   </param>
 
   <param name="tts.voice.config">

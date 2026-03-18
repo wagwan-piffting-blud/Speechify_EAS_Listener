@@ -75,8 +75,8 @@ PATCHES = {
     'tts.voiceCfg.DUR_WEIGHT':            '0.3',     # Tom's original (was 0.2)
     'tts.voiceCfg.CHUNK_BIAS_WEIGHT':     '0.25',    # Tom's original (was 0.5)
     'tts.voiceCfg.UNIT_BIAS_WEIGHT':      '0.25',    # Tom's original (was 0.5)
-    'tts.voiceCfg.HALFPHONE_CAND_PRUNE_THRESH': '0.8',  # Tom's original
-    'tts.voiceCfg.HALFPHONE_CAND_MAX_UNITS': '50',    # engine default (200 made stutter worse)
+    'tts.voiceCfg.HALFPHONE_CAND_PRUNE_THRESH': '3.0',  # Engine default (2026-03-17: relaxed from 0.8 to let more candidates through without destroying quality)
+    'tts.voiceCfg.HALFPHONE_CAND_MAX_UNITS': '200',    # Raised to allow more candidates through (2026-03-17: was 50)
     'tts.voiceCfg.CONTEXT_COST_WEIGHT':    '1.0',    # Tom's original
 }
 
