@@ -58,7 +58,7 @@ def main():
     voice_out = os.path.join(PROJ, "en-US", voice_name, "output")
 
     IN_DIR = os.path.join(PROJ, "reveng", "voice_cloning", "rvc_input_flashsr")
-    OUT_DIR = os.path.join(voice_out, "%s_rvc_pure_crepe" % voice_name)
+    OUT_DIR = os.path.join(voice_out, "%s_rvc" % voice_name)
     if model_path is None:
         model_path = os.path.join(
             voice_out, "rvc-no-gui", "RVC", "assets", "weights",
@@ -104,7 +104,7 @@ def main():
     for i in range(n_workers):
         rvc = RVCInference(device="cuda:0")
         rvc.load_model(model_path)
-        rvc.set_params(f0up_key=f0up_key, f0method="crepe", protect=0.1)
+        rvc.set_params(f0up_key=f0up_key, f0method="rmvpe", protect=0.1)
         models.append(rvc)
     print("  %d models loaded" % n_workers)
 

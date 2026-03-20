@@ -200,15 +200,10 @@ def main():
 if __name__ == "__main__":
     main()
 
-# TEST SENTENCE: And now a look at weather conditions at 9 P.M. Wichita was cloudy, the temperature was 63, dew point 54 and the relative humidity was 72 percent.
-
 """
+TEST SENTENCE: And now a look at weather conditions at 9 P.M. Wichita was cloudy, the temperature was 63, dew point 54 and the relative humidity was 72 percent.
+
 USAGE:
 
-python patch_f0tr.py ^
-    --vin "en-US\aimara\aimara_orig.vin" ^
-    --output "en-US\aimara\aimara.vin" ^
-    --scale 1.0 ^
-    --expand 6.0
-
+python patch_f0tr.py --vin "en-US\aimara\aimara.vin" --output "en-US\aimara\aimara_mod.vin" --scale 1.0 --expand 6.0
 """
