@@ -20,6 +20,10 @@ import sys
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
+import numpy as np
+from scipy.io import wavfile
+
+PAD_SECONDS = 1.5  # silence padding on each side to help RVC with short recordings
 
 
 def _detect_proj_root():
@@ -30,7 +34,7 @@ def _detect_proj_root():
         cur = start
         while cur and cur not in seen:
             seen.add(cur)
-            if os.path.isfile(os.path.join(cur, "bin", "spfy_dumpwav32_8khz.exe")):
+            if os.path.isfile(os.path.join(cur, "bin", "spfy_dumpwav.exe")):
                 return cur
             parent = os.path.dirname(cur)
             if parent == cur:
@@ -118,8 +122,29 @@ def main():
         wav_path, out_path = args
         worker_id = threading.current_thread()._ident % n_workers
         rvc = models[worker_id % len(models)]
+        name = os.path.basename(wav_path)
+        padded_path = None
         try:
-            rvc.infer_file(wav_path, out_path)
+            # Pad input with silence so RVC has enough context
+            sr, data = wavfile.read(wav_path)
+            pad_samples = int(sr * PAD_SECONDS)
+            pad = np.zeros(pad_samples, dtype=data.dtype)
+            padded = np.concatenate([pad, data, pad])
+            padded_path = os.path.join(OUT_DIR, "_padded_%s" % name)
+            wavfile.write(padded_path, sr, padded)
+
+            # RVC on padded input
+            rvc.infer_file(padded_path, out_path)
+
+            # Trim padding from RVC output (may have different sample rate)
+            sr_out, data_out = wavfile.read(out_path)
+            trim_samples = int(sr_out * PAD_SECONDS)
+            if len(data_out) > trim_samples * 2:
+                trimmed = data_out[trim_samples:-trim_samples]
+            else:
+                trimmed = data_out
+            wavfile.write(out_path, sr_out, trimmed)
+
             with lock:
                 done += 1
                 if done % 100 == 0:
@@ -133,7 +158,13 @@ def main():
             with lock:
                 failed += 1
                 if failed <= 5:
-                    print("  FAILED: %s: %s" % (os.path.basename(wav_path), e))
+                    print("  FAILED: %s: %s" % (name, e))
+        finally:
+            if padded_path and os.path.exists(padded_path):
+                try:
+                    os.remove(padded_path)
+                except OSError:
+                    pass
 
     with ThreadPoolExecutor(max_workers=n_workers) as pool:
         futures = [pool.submit(convert, args) for args in todo]

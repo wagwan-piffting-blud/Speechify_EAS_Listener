@@ -469,6 +469,265 @@ Frida diagnostic (`diag_extra_selection`) confirmed:
 
 ---
 
+## Full Synthesis Pipeline Architecture (confirmed 2026-04-03, Ghidra MCP)
+
+Decompiled via Ghidra MCP server across all three DLLs. The complete synthesis flow:
+
+```
+Text input
+  |
+  v
+SWIttsEngineMsft.dll (orchestrator)
+  |-- SWIttsInitEx -> SWIttsOpenPortEx -> SWIttsResourceAllocate
+  |-- SWIttsSpeakEx -> ConcatTTSEngine::enhancedSPRCallback (0x06B18F70)
+  |     |
+  |     |-- FUN_06b0c460: Parse ESPR into utterance (Festival-derived)
+  |     |     Relations: Segment, Syllable, SylStructure, Intonation, IntEvent,
+  |     |     Phrase, Target, Control, Notification, WordStructure
+  |     |
+  |     |-- SWIttsUSelUnitSelection(uselHandle, voiceHandle, utterance, &result)
+  |     |     [SWIttsUSel.dll -- unit selection + Viterbi]
+  |     |
+  |     |-- SWIttsWsolaConcat(wsolaHandle, voiceHandle, utterance, result)
+  |     |     [SWIttsWsola.dll -- overlap-add synthesis]
+  |     |
+  |     |-- FUN_06b18b00: staticAudioCallback (deliver audio to user)
+  |
+  v
+Audio output (u-law 8kHz or L16 8/16kHz)
+```
+
+### Initialization sequence (ConcatTTSEngine::initialize at 0x06B1ACA0)
+
+```
+SWIttsSSMLInit(strictValidation, failOnAudioFetchError)
+SWIttsLexInit()
+SWIttsUSelInit(0, configParams)
+SWIttsUSelCreateVoice(&DAT_06b2f368, 0, configParams)     <- loads VIN for unit selection
+SWIttsWsolaInit(0, configParams)
+SWIttsWsolaCreateVoice(&DAT_06b2f36c, 0, configParams, DAT_06b2f368)  <- gets USel voice!
+```
+
+Note: WSOLA voice creation receives the USel voice handle -- WSOLA has access to VIN data.
+
+### Sub-DLL architecture
+
+| DLL | Role | Key Exports |
+|-----|------|-------------|
+| SWIttsEngineMsft.dll | Orchestrator, ESPR parsing, callbacks | SWIttsSpeakEx, SWIttsSetParameter |
+| SWIttsUSel.dll | Unit selection, Viterbi, CART trees | SWIttsUSelUnitSelection |
+| SWIttsWsola.dll | Audio concat, pitch smoothing, VDB I/O | SWIttsWsolaConcat |
+| SWIttsFe-en-US.dll | English text-to-ESPR frontend | (not yet analyzed) |
+| SWIttsEngineUtil.dll | RIFF I/O, XOR decode, audio conversion | SWIttsAudioCvtUlawToL16 |
+| SWIttsConfig.dll | Configuration management | getInstance, init, shutdown |
+| SWIttsSSML.dll | SSML parsing | SWIttsSSMLParse |
+| SWIttsLex.dll | Lexicon | SWIttsLexInit |
+
+### Festival/Flite heritage
+
+String evidence confirms SpeechWorks built on Festival/Flite:
+- Value types: `dur_stats`, `vit_cand`, `clunit_db`, `diphone_db`, `sts_list`, `lpcres`
+- Utterance system: relations, items, features, ffunctions
+- CART tree features: `lisp_mod_tobi_accent`, `lisp_stress_and_accent`, `syllfoot`, etc.
+
+---
+
+## USel Scoring Components (confirmed 2026-04-03, Ghidra decompile)
+
+The `TOTAL PATH` debug string reveals 6 scoring components:
+
+```
+TOTAL PATH %d units scores (S %f D %f DU %f SP %f J %f F0 %f)
+```
+
+| Component | Config Weight | Mechanism |
+|-----------|--------------|-----------|
+| **S** (Static) | `CONTEXT_COST_WEIGHT` (1.0) | 4-component context tables from VIN ccos |
+| **D** (Duration) | `DUR_WEIGHT` (0.3) | `\|scale * (actual_dur - durt_prediction)\|^2` |
+| **DU** (Duration2) | same | Log-domain alternative duration metric |
+| **SP** (Position) | `*_MISMATCH_COST` (0.05 each) | Prosodic position tables from VCF |
+| **J** (Join) | `JOIN_COST_WEIGHT` (0.7) | Hash table lookup (precomputed spectral) |
+| **F0** (Pitch) | `ABS_F0_WEIGHT` (0.05-0.2) | `\|scale * (actual_f0 - f0tr_prediction)\|^2` |
+
+### Duration scoring (FUN_08e8d550 decompiled)
+
+For each candidate unit:
+1. Evaluate durt CART tree for this phone in context -> `predicted_mean`, `stddev`
+2. Read candidate's stored duration byte (unit+0x12 in memory)
+3. If emphasis enabled and emphasis_level > 0:
+   `predicted_mean += (1/stddev) * emph_dur_offsets[emphasis_level]`
+4. Score = `|stddev * (stored_dur - predicted_mean)|^2`
+
+### F0 scoring (same function)
+
+1. Evaluate f0tr CART tree -> `predicted_f0`, `f0_stddev`
+2. Read candidate's stored f0_start byte (unit+0x0F in memory)
+3. If emphasis enabled and emphasis_level > 0:
+   `predicted_f0 += (1/f0_stddev) * emph_f0_offsets[emphasis_level]`
+4. If f0_start == 0 (unvoiced): add `MISSING_F0_COST` (default 1000.0)
+5. Else: Score = `|f0_stddev * (f0_start - predicted_f0)|^2`
+
+### Per-score logging format strings
+
+```
+durcomp target_index %d syl_type %d syl_context %d phones (%d %d %d) phone_count %d phone_in_syl %d node_index %d
+DUR %d %f -> %f diff %f scaled %f tot %f
+DUR2 %d %f (%f) -> %f diff %f
+ABS_F0 %d %f -> %f diff %f scaled %f tot %f
+Phrase_pos unit %d %d -> %d : %f
+Syl_type unit %d %d -> %d : %f
+Word_pos unit %d %d -> %d : %f
+Phone_pos unit %d %d -> %d : %f
+```
+
+---
+
+## USel VCF Config Struct (confirmed 2026-04-03, FUN_08e90dc0 disassembly)
+
+Complete mapping of the config struct (ESI base) from assembly analysis:
+
+| Offset | Type | Default | VCF Parameter |
+|--------|------|---------|---------------|
+| 0x00 | int | 0 | `SKIP_WORDS` |
+| 0x04 | int | 0 | `SKIP_SYLS` |
+| 0x08 | str | NULL | `STATS_LOG_FILE` |
+| 0x0C | byte | 0 | `LOG_COMPONENT_SCORES` |
+| 0x10 | float | 0.1 | `PHRASE_POS_MISMATCH_COST` |
+| 0x14 | float | 0.1 | `STRESS_MISMATCH_COST` |
+| 0x18 | float | 0.0 | `SYLL_IN_WORD_MISMATCH_COST` |
+| 0x1C | float | 0.0 | `WORD_IN_PHRASE_MISMATCH_COST` |
+| 0x20 | float | 0.0 | `PHONE_IN_SYL_MISMATCH_COST` |
+| 0x24 | float | 0.01 | `F0_EDGE_CHANGE_WEIGHT` |
+| 0x28 | float | 0.1 | `ABS_F0_WEIGHT` |
+| 0x2C | float | 0.25 | `JOIN_COST_WEIGHT` |
+| 0x30 | float | 0.2 | `JOIN_COST_OFFSET` |
+| 0x34 | float | 0.01 | `DUR_WEIGHT` |
+| 0x38 | float | 1.0 | `UNIT_BIAS_WEIGHT` |
+| 0x3C | float | -1.0 | `CHUNK_BIAS_WEIGHT` |
+| 0x40 | str | NULL | `UNIT_SCORE_FILE` / `DUMP_NETWORK_FILE` |
+| 0x44 | float | 0.6 | `CONTEXT_COST_WEIGHT` |
+| 0x48 | int | 50 | `HALFPHONE_CAND_MAX_UNITS` |
+| 0x4C | float | 3.0 | `HALFPHONE_CAND_PRUNE_THRESH` |
+| 0x50 | float | 0.005 | `HALFPHONE_CAND_PRUNE_SLOPE` |
+| 0x54 | float | 3.0 | `SYL_CAND_PRUNE_THRESH` |
+| 0x58 | float | 0.005 | `SYL_CAND_PRUNE_SLOPE` |
+| 0x5C | float | 3.0 | `WORD_CAND_PRUNE_THRESH` |
+| 0x60 | float | 0.005 | `WORD_CAND_PRUNE_SLOPE` |
+| 0x64 | str | NULL | `ACTIVE_UNIT_FILE` |
+| 0x68 | float | 0.0 | `V0_JCW` (voiced-0 join cost weight) |
+| 0x6C | float | 0.0 | `V0_JCO` (voiced-0 join cost offset) |
+| 0x70 | float | 0.0 | `V1_JCW` |
+| 0x74 | float | 0.0 | `V1_JCO` |
+| 0x78 | float | 0.0 | `V2_JCW` |
+| 0x7C | float | 0.0 | `V2_JCO` |
+| 0x80 | float | 5.0 | `MISSING_JOIN_COST` |
+| 0x84 | float | 1000.0 | `MISSING_F0_COST` |
+| 0x88 | int | 0 | `APPLY_ALL_F0` |
+| 0x8C | int | 0 | `APPLY_ALL_F0_EDGE` |
+| 0x90 | int | 0 | `GET_RID_OF_PATH_F0` |
+| 0x94 | int | 0 | `ACCENT_PHRASE_SINGLE` |
+| 0x98 | byte | 0 | **`EMPH_ENABLED`** (undocumented) |
+| 0x9C | float | 0.0 | **`EMPH1_F0_OFFSET`** (undocumented) |
+| 0xA0 | float | 0.0 | **`EMPH2_F0_OFFSET`** (undocumented) |
+| 0xA4 | float | 0.0 | **`EMPH3_F0_OFFSET`** (undocumented) |
+| 0xA8 | float | 0.0 | **`EMPH1_DUR_OFFSET`** (undocumented) |
+| 0xAC | float | 0.0 | **`EMPH2_DUR_OFFSET`** (undocumented) |
+| 0xB0 | float | 0.0 | **`EMPH3_DUR_OFFSET`** (undocumented) |
+| 0xB4 | byte | 0 | `RELOAD_ACTIVE_UNITS` |
+| 0xB5 | byte | 0 | `RELOAD_USelExperimentConfig` |
+| 0xB8 | str | NULL | `DUMP_RANK_STATS_FILE` |
+| 0xBC | str | NULL | `DUMP_SCORE_SCATTER_FILE` |
+| 0xC0 | str | NULL | `DUMP_PRESELECT_INFO_FILE` |
+| 0xC4 | byte | 0 | `USE_DIPHONES` |
+
+The `speedVsQuality` parameter (float 0-1) at the end scales `HALFPHONE_CAND_MAX_UNITS`:
+`new_max = round(speedVsQuality * max_units)`, clamped to [1, current_max].
+
+### Emphasis system (new discovery 2026-04-03)
+
+The emphasis system is activated by `EMPH_ENABLED=1` in VCF (absent from all existing voices).
+When active, the `word_prominence` ESPR feature triggers per-word F0/duration offsets:
+- Emphasis level 1/2/3 adds `(1/stddev) * EMPH_F0_OFFSET` to predicted F0
+- Same formula for duration offsets
+- Only applies to words with `word_prominence` set (from SSML `<emphasis>` or ESPR)
+
+### CART tree features used by durt/f0tr (from strings in USel.dll)
+
+```
+aspiration, fw_ident, accpos, wordpos, syllinword, syllpos,
+lisp_mod_tobi_endtone, lisp_mod_tobi_accent,
+lisp_stress_and_2accents, lisp_stress_and_accent,
+lisp_final_boundary_strength, lisp_initial_boundary_strength,
+wordprom, syllfoot, syl_break, onsetcoda,
+syl_final, syl_initial, word_final, word_initial,
+power_z, dur_z, power, mpitch, contentp, closure
+```
+
+---
+
+## WSOLA Prosody Modes (confirmed 2026-04-03, Ghidra decompile)
+
+### Two concatenation modes (FUN_08ee1160)
+
+Set by flag at WSOLA_state+0x3614:
+- **Mode 0 = "Selective F0 smoothing"**: Pitch-mark-based overlap-add at voiced joins.
+  Used when voice has pitch mark data (f0tr tree loaded in VIN).
+- **Mode 1 = "Plain WSOLA"**: Simple overlap-add without pitch-aware alignment.
+  Used when no pitch mark data available.
+
+### WSOLA VCF parameters (SWIttsWsolaCreateResource at 0x08EE6410)
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `apply_target_prosody` | 0 | Master prosody modification switch |
+| `use_prosody` | 0 | Fallback for above |
+| `dur_mods` | 1 | Duration modification enabled |
+| `amp_mods` | 1 | Amplitude modification enabled |
+| `genf0dur` | 0 | Generate F0/duration (Craig VCF: 0) |
+| `pmindex` | (none) | Optional pitchmark index file path |
+| `pmdata` | (none) | Optional pitchmark data file path |
+
+Logic: `amp_enabled = (apply_target_prosody != 0) && (amp_mods != 0)`
+
+### Duration modification in WSOLA (FUN_08ee2960)
+
+When `apply_target_prosody` is enabled, per-subunit duration is modified:
+```
+rate = CONSTANT / target_rate_value
+if (phone == "pau"):
+    new_dl = dl * rate          // pauses: scale dl directly
+else:
+    new_dl = duration * rate    // speech: scale by prediction
+```
+
+The target rate comes from ESPR "Control" and "Target" relations (speech rate control),
+NOT from the durt CART trees. **durt trees only influence unit SELECTION in USel, not
+audio modification in WSOLA.**
+
+### Voiced join types (wsola_join.cpp)
+
+At voiced boundaries, the engine detects and handles:
+- vowel-vowel, vowel-nasal, vowel-approximant
+- nasal-nasal, approximant-approximant
+- Pitch glitch detection at join points
+- Minimum overlap requirements
+
+### Key insight: prosody flow
+
+```
+durt trees -> influence which units Viterbi SELECTS (duration scoring in USel)
+f0tr tree  -> influence which units Viterbi SELECTS (F0 scoring in USel)
+             + pitch-mark smoothing at voiced joins in WSOLA (mode 0)
+
+The actual output timing = next_unit.lp - this_unit.lp (from VIN unit table)
+The actual output pitch = original recording pitch, smoothed at boundaries
+```
+
+**durt trees do NOT rewrite output duration. They bias unit selection toward
+units with durations matching the predicted target.**
+
+---
+
 ## Open Questions
 
 1. **SOLVED (Frida 2026-03-13)**: Crash = cursor overflow (hypothesis A). cursor=-824 at call #140; n_bytes was normal (1704). Fix needed: prevent negative-dur units in Mara VIN feature_table.
@@ -478,3 +737,5 @@ Frida diagnostic (`diag_extra_selection`) confirmed:
 4. Full vtable at 0x8EE9F14 (entries 0,1,3,5 not yet disassembled)
 5. VDB segment structure: how many segments, what is `[audio_obj+0x34]` (segment index or byte offset?)
 6. Feature table population: how does 0x8EE6410 (SWIttsWsolaCreateResource) load feature data from VIN?
+7. **NEW**: SWIttsFe-en-US.dll -- frontend prosody assignment (stress, prominence, phrase type). How are these features generated from text? Can they be modified to change Craig's prosody?
+8. **NEW**: How exactly does f0tr data flow into WSOLA pitch mark smoothing? The mode 0 path loads pitch marks per-unit from VDB and uses `FUN_08ee23d0` to process them -- needs further decompilation.

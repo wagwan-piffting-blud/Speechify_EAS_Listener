@@ -53,7 +53,7 @@ def _detect_proj_root():
 
 
 PROJ = _detect_proj_root()
-SYNTH_EXE = os.path.join(PROJ, "bin", "spfy_dumpwav32_8khz.exe")
+SYNTH_EXE = os.path.join(PROJ, "bin", "spfy_dumpwav.exe")
 
 XOR = 0xCE
 UNIT_SIZE = 29
@@ -71,6 +71,12 @@ VOICE_CONFIGS = {
         'tom_vin': os.path.join(PROJ, "en-US", "tom", "tom.vin"),
         'n_units': 169579,
     },
+    'craig': {
+        'vin': os.path.join(PROJ, "en-US", "aicraig", "aicraig.vin"),
+        'vdb': os.path.join(PROJ, "en-US", "aicraig", "aicraig8.vdb"),
+        'tom_vin': os.path.join(PROJ, "en-US", "tom", "tom.vin"),
+        'n_units': 169579,
+    }
 }
 
 PHONE_LABELS = [
@@ -619,7 +625,7 @@ def main():
     # -------------------------------------------------------------------
     # 6. Visualization
     # -------------------------------------------------------------------
-    viz_path = os.path.join(OUT_DIR, "diag_mara_gt_viz.png")
+    viz_path = os.path.join(OUT_DIR, f"diag_{voice}_gt_viz.png")
     print("Generating visualization -> %s" % viz_path)
     generate_timeline_viz(comparison_data, wsola_uids, text, voice, viz_path)
     print("Visualization saved to: %s" % viz_path)

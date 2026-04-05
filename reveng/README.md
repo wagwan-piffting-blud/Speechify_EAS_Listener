@@ -653,6 +653,49 @@ format tag (8 for 8 kHz) at runtime. A 16 kHz voice would load `tom16.vdb`.
 | `use_dynamic_cost` | 1 | Enable dynamic cost computation |
 | `USE_F0_PROBABILITIES` | 1 | Use probabilistic F0 prediction |
 | `USE_STRESS_AND_PA` | 1 | Include stress and pitch accent in selection |
+| `APPLY_ALL_F0` | 0 | Apply F0 scoring to all units (not just voiced) |
+| `APPLY_ALL_F0_EDGE` | 1 | Apply F0 edge change scoring to all units |
+| `GET_RID_OF_PATH_F0` | 1 | Remove path-level F0 from scoring |
+| `ACCENT_PHRASE_SINGLE` | 1 | Single accent per phrase |
+| `USE_DIPHONES` | 0 | Diphone emulation mode |
+
+### Emphasis System (discovered 2026-04-03, absent from all existing VCF files)
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `EMPH_ENABLED` | 0 (off) | Enable emphasis system |
+| `EMPH1_F0_OFFSET` | 0.0 | F0 shift for emphasis level 1 |
+| `EMPH2_F0_OFFSET` | 0.0 | F0 shift for emphasis level 2 |
+| `EMPH3_F0_OFFSET` | 0.0 | F0 shift for emphasis level 3 |
+| `EMPH1_DUR_OFFSET` | 0.0 | Duration shift for emphasis level 1 |
+| `EMPH2_DUR_OFFSET` | 0.0 | Duration shift for emphasis level 2 |
+| `EMPH3_DUR_OFFSET` | 0.0 | Duration shift for emphasis level 3 |
+
+When enabled, the emphasis system modifies f0tr/durt CART tree predictions for words
+with `word_prominence` set (via SSML `<emphasis>` tags). Each emphasis level adds
+`(1/stddev) * offset` to the predicted mean, biasing unit selection toward units with
+higher F0 or longer duration for emphasized words.
+
+### WSOLA Prosody Parameters (discovered 2026-04-03)
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `apply_target_prosody` | 0 | Master switch for prosody modification in WSOLA |
+| `use_prosody` | 0 | Fallback for above |
+| `dur_mods` | 1 | Enable duration modification |
+| `amp_mods` | 1 | Enable amplitude modification |
+| `genf0dur` | 0 | Generate F0/duration targets |
+
+### Voiced Join Cost Variants (discovered 2026-04-03)
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `V0_JCW` / `V0_JCO` | 0.0 / 0.0 | Voiced level 0: join cost weight / offset |
+| `V1_JCW` / `V1_JCO` | 0.0 / 0.0 | Voiced level 1: join cost weight / offset |
+| `V2_JCW` / `V2_JCO` | 0.0 / 0.0 | Voiced level 2: join cost weight / offset |
+
+When non-zero, these override the global `JOIN_COST_WEIGHT`/`JOIN_COST_OFFSET` for
+units at different voicing levels (unvoiced, partially voiced, fully voiced).
 
 ### Prosody Mismatch Costs
 
@@ -704,15 +747,23 @@ VDB indx: "Recording date_005 starts at byte offset 1,234,567 in the data chunk"
 VDB data: [raw mu-law audio bytes for date_005]
 ```
 
-At synthesis time:
-1. The engine converts the input text to a phoneme sequence.
-2. `prsl` gives it a short list of candidate units for each phoneme context.
-3. `f0tr`/`durt` predict target F0 and duration for each position.
-4. The Viterbi algorithm finds the best path through candidates, penalizing:
-   - Poor join quality (`hash` lookup, weighted by `JOIN_COST_WEIGHT`)
-   - Wrong phonetic context (`unit +0x0C..0x0F` vs. target, weighted by `CONTEXT_COST_WEIGHT`)
-   - Wrong duration/F0 (`mean`/`hist` Z-score lookup, weighted by `DUR_WEIGHT`/`ABS_F0_WEIGHT`)
-5. Selected units are retrieved from the VDB and concatenated.
+At synthesis time (confirmed 2026-04-03 via Ghidra decompilation of all three DLLs):
+1. **Frontend** (`SWIttsFe-en-US.dll`) converts text to ESPR (Enhanced SPR) with prosodic
+   annotations: stress, word prominence, phrase type, syllable structure, intonation events.
+2. **ESPR parsing** (`ConcatTTSEngine::enhancedSPRCallback`) builds a Festival-style utterance
+   with relations: Segment, Syllable, SylStructure, Intonation, IntEvent, Phrase, Target, etc.
+3. **USel** (`SWIttsUSel.dll`) runs unit selection with 6 scoring components:
+   - `prsl` gives candidate units for each halfphone context (left-center-right trigram)
+   - `f0tr`/`durt` CART trees predict target F0 and duration for each position
+   - Each candidate is scored: **S** (context) + **D** (duration) + **DU** (duration2) +
+     **SP** (syllable/phrase position) + **J** (join cost) + **F0** (pitch match)
+   - Viterbi finds minimum-cost path through the candidate lattice
+4. **WSOLA** (`SWIttsWsola.dll`) concatenates selected units from VDB:
+   - Audio loaded via memory-mapped files (segmented MapViewOfFile)
+   - Two modes: "Selective F0 smoothing" (pitch-mark overlap-add at voiced joins)
+     or "Plain WSOLA" (simple overlap-add)
+   - **Output duration = next_unit.lp - this_unit.lp** (from VIN, NOT from durt trees)
+   - durt trees only influence which units are *selected*, not the output timing
 
 ---
 

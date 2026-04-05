@@ -1556,6 +1556,68 @@ FlashSR uses one-step diffusion distillation, claimed 22x faster than AudioSR.
 
 ### Project status
 - Mara voice: COMPLETE + ENHANCED (prosody via f0tr, smoothing via WSOLA)
-- Craig voice: next (same pipeline, new RVC model)
+- Craig voice: IN PROGRESS (DLL deep dive complete, patch_durt.py next)
 - All reverse engineering goals achieved: VIN/VDB/VCF formats fully understood
+
+---
+
+## Experiment 78: DLL Deep Dive via Ghidra MCP (2026-04-03)
+
+**Goal:** Understand the full synthesis pipeline across all three DLLs to identify levers
+for improving Craig's prosody (currently sounds like "Tom's rhythm with Craig's voice").
+
+**Method:** Connected Ghidra MCP server and decompiled key functions across:
+1. SWIttsEngine.dll (orchestrator)
+2. SWIttsUSel.dll (unit selection)
+3. SWIttsWsola.dll (WSOLA synthesis)
+
+**Key findings:**
+
+### 1. Complete synthesis pipeline mapped
+```
+Text -> ESPR (Frontend) -> USel (unit selection + Viterbi) -> WSOLA (audio concat) -> Output
+```
+- ConcatTTSEngine::enhancedSPRCallback at 0x06B18F70 orchestrates the entire flow
+- USel and WSOLA voices are initialized together; WSOLA receives USel voice handle
+- Festival/Flite heritage confirmed (utterance relations, value types, CART features)
+
+### 2. USel scoring has 6 components: S, D, DU, SP, J, F0
+- Duration scoring: `|scale * (actual_dur - durt_prediction)|^2` weighted by DUR_WEIGHT
+- F0 scoring: `|scale * (actual_f0 - f0tr_prediction)|^2` weighted by ABS_F0_WEIGHT
+- Full config struct mapped (0xC8 bytes, 40+ parameters) from disassembly of FUN_08e90dc0
+
+### 3. Undocumented emphasis system discovered
+- `EMPH_ENABLED` (byte, default 0) -- absent from all existing VCF files
+- `EMPH1/2/3_F0_OFFSET` (float) -- shifts f0tr predictions for emphasized words
+- `EMPH1/2/3_DUR_OFFSET` (float) -- shifts durt predictions for emphasized words
+- Triggered by `word_prominence` ESPR feature (SSML `<emphasis>` tags)
+
+### 4. Craig vs Tom VCF comparison
+- Only difference: `ABS_F0_WEIGHT = 0.05` (Craig) vs `0.2` (Tom)
+- All other weights identical (DUR_WEIGHT=0.3, JOIN_COST_WEIGHT=0.7, etc.)
+- HALFPHONE_CAND_MAX_UNITS missing from Craig VCF (defaults to 50)
+- No emphasis parameters in either voice
+
+### 5. WSOLA has two concat modes
+- Mode 0 "Selective F0 smoothing": pitch-mark overlap-add at voiced joins (when f0tr loaded)
+- Mode 1 "Plain WSOLA": simple overlap-add (no pitch data)
+- Additional VCF params: `apply_target_prosody`, `dur_mods`, `amp_mods`
+- **Critical**: durt trees do NOT modify output duration in WSOLA -- they only bias unit SELECTION
+
+### 6. Root cause of Craig's "Tom prosody" problem
+The Viterbi search optimizes: "find Craig units that best match TOM's predicted rhythm/pitch"
+- Tom's durt trees -> Tom's target durations -> units selected to match Tom's timing
+- Tom's f0tr tree -> Tom's target pitch -> units selected to match Tom's F0
+- Per-unit dur_z and pitch_z in VIN still reflect Tom's original recordings
+- Output timing = lp differences from Tom's VIN, not from durt predictions
+
+### Proposed fixes (priority order)
+1. **patch_durt.py**: Modify durt tree leaf values to match Craig's natural rhythm
+2. **Update per-unit metadata**: Rewrite dur_z/pitch_z bytes to match Craig's actual audio
+3. **VCF tuning**: Reduce DUR_WEIGHT, increase STRESS_MISMATCH_COST, add HALFPHONE_CAND_MAX_UNITS
+4. **patch_f0tr.py**: Already proven for Mara; apply with Craig-appropriate parameters
+
+**STATUS:** COMPLETE -- full DLL analysis done. Proceeding to patch_durt.py implementation.
+
+See `reveng/DLL_ANALYSIS.md` for full decompilation details, struct layouts, and function maps.
 - Build pipeline proven and repeatable for new voices

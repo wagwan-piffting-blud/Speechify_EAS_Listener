@@ -6,8 +6,10 @@ es-MX/paulina/
 **/*logs*/
 commands.txt
 *.wav
+*.prn
 *.csv
 *.log
+reveng/att/
 *.json*
 !tom_vin_structure.json
 wav*
