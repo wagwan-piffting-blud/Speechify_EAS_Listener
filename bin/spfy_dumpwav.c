@@ -167,6 +167,7 @@ typedef struct {
     FILE *phonemeOut;           // .phn file (NULL if disabled)
     volatile LONG gotAudio;
     volatile LONG done;
+    HANDLE doneEvent;           // signaled when synthesis completes
     uint32_t bytesWritten;
     int enablePhonemes;
     int rawDump;
@@ -258,11 +259,13 @@ static SWIttsResult SWIAPI cb(SWIttsPort port, int status, void *data, void *use
         // NULL data: start/end/stopped/portclosed/errors
         if (ctx->gotAudio) {
             InterlockedExchange(&ctx->done, 1);
+            SetEvent(ctx->doneEvent);
         } else {
             fwprintf(stderr, L"INFO: NULL data on port %d (status=%d) done=%d\n",
                 (int)port, status, (int)ctx->done);
             if (status != 0) {
                 InterlockedExchange(&ctx->done, 1);
+                SetEvent(ctx->doneEvent);
             }
         }
     }
@@ -467,6 +470,7 @@ int wmain(int argc, wchar_t **wargv) {
     Ctx ctx = {0};
     ctx.out = f;
     ctx.phonemeOut = phnFile;
+    ctx.doneEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
     ctx.enablePhonemes = enablePhonemes;
     ctx.rawDump = rawDump;
     ctx.g2pMode = g2pMode;
@@ -503,8 +507,11 @@ int wmain(int argc, wchar_t **wargv) {
     // Speak
     const unsigned char *bytes = (const unsigned char*)utf8buf;
     unsigned len = (unsigned)strlen(utf8buf);
-    // SPR tags are inline in plain text, not a separate content type
+    // Auto-detect SSML: if input starts with '<speak' or '<?xml', use SSML content type
     const char *contentType = "text/plain;charset=utf-8";
+    if (strncmp(utf8buf, "<speak", 6) == 0 || strncmp(utf8buf, "<?xml", 5) == 0) {
+        contentType = "application/synthesis+ssml";
+    }
 
     fwprintf(stderr, L"INFO: Speaking (%hs)...\n", contentType);
 
@@ -512,8 +519,9 @@ int wmain(int argc, wchar_t **wargv) {
         fprintf(stderr, "SWIttsSpeak failed\n");
     }
 
-    // Wait for completion
-    while (!ctx.done) Sleep(10);
+    // Wait for completion (event-based, no polling delay)
+    WaitForSingleObject(ctx.doneEvent, 60000);
+    CloseHandle(ctx.doneEvent);
 
     fwprintf(stderr, L"INFO: Done. Closing port.\n");
 

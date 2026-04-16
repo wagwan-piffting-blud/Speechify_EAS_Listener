@@ -117,6 +117,20 @@ Balabolka format uses space-separated ARPAbet codes with stress markers after vo
 | `--16k` | Use 16kHz output (default: 8kHz) |
 | `--rawdump` | Dump raw callback bytes to stderr (diagnostic) |
 
+### Speed Fix (patch_speed.py)
+
+Out of the box, the Speechify engine throttles synthesis to match realtime playback speed, which makes batch file output extremely slow (~41 seconds for a 200-word paragraph). This is unnecessary for file output. The included `patch_speed.py` removes this throttle by patching a single Sleep call in `SWIttsEngine.dll`, resulting in a **7-8x speedup** (41s down to ~5s for the same text).
+
+To apply:
+```
+1. Stop Speechify.exe
+2. cd bin
+3. python patch_speed.py
+4. Restart Speechify.exe
+```
+
+The patch backs up the original DLL as `SWIttsEngine_orig.dll`. To revert, copy the backup over `SWIttsEngine.dll`. For technical details on how this was discovered and how the throttle works, see [reveng/SPEED_FIX.md](reveng/SPEED_FIX.md).
+
 ### Building from Source
 
 Requires Microsoft Visual C++ (any version with `cl.exe`):

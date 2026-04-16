@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speechify Engine Visualizer</title>
+    <link rel="stylesheet" href="/static/css/main.css">
+</head>
+<body>
+    <header>
+        <h1>Speechify Engine Visualizer</h1>
+        <div id="voice-selector">
+            <label for="voice-select">Voice:</label>
+            <select id="voice-select"></select>
+            <span id="voice-info"></span>
+        </div>
+    </header>
+
+    <nav id="tabs">
+        <button class="tab active" data-tab="vin-explorer">VIN Explorer</button>
+        <button class="tab" data-tab="trees">Trees</button>
+        <button class="tab" data-tab="vdb-explorer">VDB Explorer</button>
+        <button class="tab" data-tab="synth-tracer">Synthesis Tracer</button>
+    </nav>
+
+    <main>
+        <!-- Tab 1: VIN Explorer -->
+        <div id="vin-explorer" class="tab-content active">
+            <div class="vin-layout">
+                <aside id="chunk-sidebar">
+                    <h3>Chunks</h3>
+                    <ul id="chunk-list"></ul>
+                </aside>
+                <section id="chunk-detail">
+                    <div id="chunk-info">
+                        <p class="placeholder">Select a chunk from the sidebar to inspect it.</p>
+                    </div>
+                    <div id="unit-table-container" style="display:none">
+                        <div class="table-controls">
+                            <label>Phone: <select id="unit-phone-filter"><option value="">All</option></select></label>
+                            <label>File idx: <input id="unit-fidx-filter" type="number" placeholder="any" style="width:60px"></label>
+                            <button id="unit-filter-btn">Filter</button>
+                            <span id="unit-count"></span>
+                        </div>
+                        <div class="table-wrap">
+                            <table id="unit-table" class="sortable">
+                                <thead>
+                                    <tr>
+                                        <th data-sort="number">idx</th><th data-sort="number">uid</th><th data-sort="string">phone</th><th data-sort="number">half</th>
+                                        <th data-sort="string">recording</th><th data-sort="number">lp</th><th data-sort="number">dl</th>
+                                        <th data-sort="number">f0s</th><th data-sort="number">f0m</th><th data-sort="number">f0e</th>
+                                        <th>play</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="unit-tbody"></tbody>
+                            </table>
+                        </div>
+                        <div class="pagination">
+                            <button id="unit-prev">Prev</button>
+                            <span id="unit-page-info"></span>
+                            <button id="unit-next">Next</button>
+                        </div>
+                    </div>
+                    <!-- Hash lookup widget -->
+                    <div id="hash-widget" style="display:none">
+                        <h3>Join Cost Hash Lookup</h3>
+                        <div id="hash-stats"></div>
+                        <div class="inline-form">
+                            <label>Left UID: <input id="hash-left" type="number" style="width:80px"></label>
+                            <label>Right UID: <input id="hash-right" type="number" style="width:80px"></label>
+                            <button id="hash-lookup-btn">Lookup</button>
+                            <span id="hash-result"></span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Tab 2: Trees -->
+        <div id="trees" class="tab-content">
+            <div class="tree-controls">
+                <button class="tree-tab active" data-tree="f0tr">f0tr (Pitch)</button>
+                <button class="tree-tab" data-tree="durt">durt (Duration)</button>
+                <select id="durt-phone-select" style="display:none">
+                    <option value="">Select phone...</option>
+                </select>
+            </div>
+            <div id="tree-info"></div>
+            <div id="tree-container"></div>
+        </div>
+
+        <!-- Tab 3: VDB Explorer -->
+        <div id="vdb-explorer" class="tab-content">
+            <div class="vdb-layout">
+                <aside id="rec-sidebar">
+                    <h3>Recordings</h3>
+                    <input id="rec-search" type="text" placeholder="Search recordings or words...">
+                    <div class="rec-sort-controls">
+                        <span style="font-size:10px;color:var(--text-dim)">Sort:</span>
+                        <button class="sort-btn active" data-sort="name">Name</button>
+                        <button class="sort-btn" data-sort="duration">Duration</button>
+                        <button class="sort-btn" data-sort="index">Index</button>
+                    </div>
+                    <ul id="rec-list"></ul>
+                    <div class="pagination">
+                        <button id="rec-prev">Prev</button>
+                        <span id="rec-page-info"></span>
+                        <button id="rec-next">Next</button>
+                    </div>
+                </aside>
+                <section id="rec-detail">
+                    <div id="rec-info">
+                        <p class="placeholder">Select a recording to view its waveform.</p>
+                    </div>
+                    <div id="waveform-container">
+                        <canvas id="waveform-canvas" width="900" height="200"></canvas>
+                    </div>
+                    <div id="rec-audio"></div>
+                </section>
+            </div>
+        </div>
+
+        <!-- Tab 4: Synthesis Tracer -->
+        <div id="synth-tracer" class="tab-content">
+            <div class="synth-controls">
+                <input id="synth-text" type="text" placeholder="Enter text to synthesize..."
+                       value="The weather today will be partly cloudy.">
+                <button id="synth-btn">Synthesize</button>
+                <span id="frida-status">Frida: not connected</span>
+                <button id="frida-attach-btn">Attach</button>
+            </div>
+            <div id="synth-timeline"></div>
+            <div id="synth-audio"></div>
+            <div id="synth-details"></div>
+        </div>
+    </main>
+
+    <script src="/static/js/app.js"></script>
+    <script src="/static/js/vin-explorer.js"></script>
+    <script src="/static/js/vdb-explorer.js"></script>
+    <script src="/static/js/tree-viz.js"></script>
+    <script src="/static/js/waveform.js"></script>
+    <script src="/static/js/audio-player.js"></script>
+    <script src="/static/js/synth-tracer.js"></script>
+</body>
+</html>

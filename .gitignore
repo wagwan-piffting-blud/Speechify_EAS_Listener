@@ -10,6 +10,7 @@ commands.txt
 *.csv
 *.log
 reveng/att/
+reveng/ss_rs/
 *.json*
 !tom_vin_structure.json
 wav*

@@ -739,3 +739,5 @@ units with durations matching the predicted target.**
 6. Feature table population: how does 0x8EE6410 (SWIttsWsolaCreateResource) load feature data from VIN?
 7. **NEW**: SWIttsFe-en-US.dll -- frontend prosody assignment (stress, prominence, phrase type). How are these features generated from text? Can they be modified to change Craig's prosody?
 8. **NEW**: How exactly does f0tr data flow into WSOLA pitch mark smoothing? The mode 0 path loads pitch marks per-unit from VDB and uses `FUN_08ee23d0` to process them -- needs further decompilation.
+9. **SOLVED (2026-04-07)**: Emphasis system fully mapped. `FUN_08e8a250` in SWIttsUSel.dll reads `word_prominence` from frontend, maps to 3 emphasis levels, applies F0/DUR offsets to scoring targets. Triggered via SSML `<emphasis>` tags. Never enabled in shipped VCFs but fully functional. See README_TECHNICAL.md for full details.
+10. **SOLVED (2026-04-07)**: SWIttsLex.dll fully mapped. XML dictionary parser using Xerces DOM. DTD embedded in DLL. Entries scored by language match (100=exact, 50=prefix). Registered via `tts.engine.dictionaries` in SWIttsConfig.xml with priority > 10000. See README_TECHNICAL.md.

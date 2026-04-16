@@ -1072,6 +1072,16 @@ See ./voice_cloning/README.md for the latest updates on the Mara voice cloning p
 
 ---
 
+## Engine Performance (Speed Fix)
+
+The Speechify engine contains a **realtime playback throttle** in `SWIttsEngine.dll` that artificially slows batch synthesis to match audio playback speed. A 200-word paragraph that produces 73 seconds of audio takes **41 seconds** to synthesize -- despite the actual computation (unit selection + WSOLA) finishing in only **136 milliseconds**.
+
+The throttle is a single `Sleep()` call in SWIttsEngine.dll that accounts for 85% of total synthesis time. Removing it via a 7-byte binary patch (NOP over `PUSH ESI; CALL [Sleep]` at file offset `0x123DA`) yields a **7.5x speedup** (41s to 5.5s). Combined with a client-side fix in `spfy_dumpwav.c` (replacing a `Sleep(10)` polling loop with an Event-based wait), the total speedup reaches **14x** (41s to 2.9s).
+
+The throttle was designed for SpeechWorks' original use case: streaming audio to telephony systems in real time. For batch file output, it's entirely unnecessary.
+
+See [SPEED_FIX.md](SPEED_FIX.md) for the full investigation, profiling methodology, and patch details.
+
 ## Key Numbers (Quick Reference)
 
 | Parameter | Value |

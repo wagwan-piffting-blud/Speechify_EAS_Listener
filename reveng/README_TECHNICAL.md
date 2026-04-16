@@ -2487,6 +2487,148 @@ in Mara's recordings and should be disabled (`dl=0`).
 
 ---
 
+## Emphasis System (SWIttsUSel.dll)
+
+An undocumented emphasis system exists in the USel scoring pipeline. It is **fully implemented but never enabled** in any shipped VCF.
+
+### Activation
+
+Enable via VCF parameter:
+```
+EMPH_ENABLED = 1
+```
+
+### How it works
+
+1. The frontend sets a `word_prominence` attribute on each word in the linguistic annotation tree (derived from ESPR ToBI accents and stress).
+2. During unit selection, `FUN_08e8a250` reads `word_prominence` for each word.
+3. If `word_prominence > 2`, emphasis level = `word_prominence - 2` (level 1, 2, or 3).
+4. Emphasis is applied only to **stressed syllables** within the emphasized word. Unstressed syllables get level 0.
+5. The emphasis level per-halfphone is stored in an array at the scoring context offset `+0x30`.
+6. During candidate scoring, the `EMPH<N>_F0_OFFSET` and `EMPH<N>_DUR_OFFSET` values shift the f0tr and durt target predictions, biasing unit selection toward higher-pitched and longer-duration units.
+
+### ToBI accent mapping (also in FUN_08e8a250)
+
+The function also builds a per-segment ToBI accent code array:
+
+| ToBI Accent | Internal Code |
+|---|---|
+| H* | 1 |
+| H+L* | 2 |
+| L* | 3 |
+| L+H* | 4 |
+| H*+L | 5 |
+| L*+H | 6 |
+
+### VCF parameters
+
+| Parameter | Role |
+|---|---|
+| `EMPH_ENABLED` | Master switch (0=off, 1=on) |
+| `EMPH1_F0_OFFSET` | F0 target shift for emphasis level 1 (Hz) |
+| `EMPH1_DUR_OFFSET` | Duration target shift for emphasis level 1 |
+| `EMPH2_F0_OFFSET` | F0 target shift for emphasis level 2 (Hz) |
+| `EMPH2_DUR_OFFSET` | Duration target shift for emphasis level 2 |
+| `EMPH3_F0_OFFSET` | F0 target shift for emphasis level 3 (Hz) |
+| `EMPH3_DUR_OFFSET` | Duration target shift for emphasis level 3 |
+
+### Triggering emphasis
+
+Emphasis is triggered via **SSML `<emphasis>` tags**. The SSML DLL (`SWIttsSSML.dll`) maps emphasis levels to internal `\!emph` escape codes:
+
+- `<emphasis level="moderate">` -> `\!emph2` -> word_prominence=3 -> EMPH1
+- `<emphasis level="strong">` -> `\!emph3` -> word_prominence=4 -> EMPH2
+- `<emphasis level="x-strong">` -> word_prominence=5 -> EMPH3
+
+The SSML content type must be `application/synthesis+ssml` (not `application/ssml+xml`). The `<speak>` tag requires the full namespace: `<speak xmlns="http://www.w3.org/2001/10/synthesis" version="1.0" xml:lang="en-US">`.
+
+Plain text input does NOT trigger emphasis -- `word_prominence` stays at 0-2.
+
+### Practical notes
+
+- On natural voices (Tom, Jill), emphasis produces an audible pitch rise and lengthening on stressed syllables of emphasized words. The effect is subtle even at high offset values.
+- On AI voice skins (Mara, Craig), emphasis has no audible effect because all units have been converted to a narrow pitch range by Seed-VC/RVC. The f0tr target shift has nothing to "reach for."
+- The NWS likely used this system with SSML emphasis on key weather terms (Severe, Warning, county names) to produce the broadcast cadence heard in True Mara recordings.
+
+### Example
+
+```xml
+<speak xmlns="http://www.w3.org/2001/10/synthesis" version="1.0" xml:lang="en-US">
+  The following message is <emphasis level="strong">transmitted</emphasis>
+  at the <emphasis level="strong">request</emphasis> of the Wisconsin
+  Emergency Management Agency.
+</speak>
+```
+
+Server log confirms activation: `Applying emphasis 3 to word transmitted`.
+
+---
+
+## Lexicalizer (SWIttsLex.dll)
+
+The lexicalizer handles custom pronunciation dictionaries. It uses a Xerces DOM XML parser to load dictionary files.
+
+### Dictionary format
+
+The DTD is embedded in the DLL. Dictionary files are XML:
+
+```xml
+<?xml version="1.0"?>
+<!DOCTYPE lexicon SYSTEM "lexicon.dtd">
+<lexicon xml:lang="en-US" alphabet="SWItts" type="main">
+  <entry key="Phillipsburg">
+    <definition value=".1f.1I.0l.1I.0p.0s.0b.1er.0g" alphabet="SWItts"/>
+  </entry>
+  <entry key="NOAA">
+    <definition value=".1n.1ow.0ax" alphabet="SWItts" part="noun"/>
+  </entry>
+</lexicon>
+```
+
+### DTD structure
+
+- **`<lexicon>`** -- root element
+  - `xml:lang` (required): language code (e.g., `en-US`)
+  - `alphabet`: `OSR` | `SWItts` | `text` (default: `OSR`)
+  - `type`: `root` | `main` | `abbreviation` | `mainext` (default: `main`)
+- **`<entry>`** -- one per word
+  - `key` (required): the word to match
+  - `xml:lang`, `alphabet`: optional per-entry overrides
+- **`<definition>`** -- pronunciation (one or more per entry)
+  - `value` (required): the pronunciation in the specified alphabet
+  - `alphabet`: override for this definition
+  - `part`: part of speech (`noun`, `verb`, `adjective`, `adverb`, `pronoun`, `preposition`, `conjunction`, `interjection`, `unknown`)
+
+### Definition scoring
+
+When multiple definitions exist, the engine scores them by language match:
+- **100** -- exact language match
+- **50** -- 2-character prefix match (e.g., `en` matches `en-US`)
+- **0** -- no match
+
+The highest-scoring definition wins.
+
+### Registration
+
+Dictionaries are registered in `SWIttsConfig.xml` under the language-specific `<lang>` section:
+
+```xml
+<lang name="en-US">
+  <param name="tts.engine.dictionaries">
+    <namedValue name="20000"> custom_dict.xml </namedValue>
+  </param>
+</lang>
+```
+
+The `name` attribute is the priority (compared against `tts.engine.dictionaryDefaultPriorityBase` = 10000). Higher priority wins over the built-in G2P. The dictionary file path is relative to the config directory.
+
+### Character encoding
+
+- ISO-8859-1 for most languages
+- Shift-JIS for Japanese (`ja-JP`)
+
+---
+
 ## Open Questions
 
 - Why final filename record in each ckls group omits `file_id` (sentinel vs. parser convenience).
