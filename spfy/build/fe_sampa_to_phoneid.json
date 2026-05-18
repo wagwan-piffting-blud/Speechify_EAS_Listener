@@ -1,0 +1,186 @@
+{
+  "mapping": {
+    "C": {
+      "phone_id": 2,
+      "support": 1,
+      "total": 3,
+      "confidence": 0.3333333333333333
+    },
+    "E": {
+      "phone_id": 12,
+      "support": 6,
+      "total": 22,
+      "confidence": 0.2727272727272727
+    },
+    "G": {
+      "phone_id": 28,
+      "support": 2,
+      "total": 2,
+      "confidence": 1.0
+    },
+    "I": {
+      "phone_id": 20,
+      "support": 3,
+      "total": 16,
+      "confidence": 0.1875
+    },
+    "O": {
+      "phone_id": 4,
+      "support": 3,
+      "total": 17,
+      "confidence": 0.17647058823529413
+    },
+    "S": {
+      "phone_id": 35,
+      "support": 1,
+      "total": 1,
+      "confidence": 1.0
+    },
+    "T": {
+      "phone_id": 37,
+      "support": 5,
+      "total": 15,
+      "confidence": 0.3333333333333333
+    },
+    "U": {
+      "phone_id": 26,
+      "support": 1,
+      "total": 3,
+      "confidence": 0.3333333333333333
+    },
+    "a": {
+      "phone_id": 6,
+      "support": 5,
+      "total": 22,
+      "confidence": 0.22727272727272727
+    },
+    "b": {
+      "phone_id": 7,
+      "support": 1,
+      "total": 2,
+      "confidence": 0.5
+    },
+    "d": {
+      "phone_id": 44,
+      "support": 2,
+      "total": 9,
+      "confidence": 0.2222222222222222
+    },
+    "e": {
+      "phone_id": 5,
+      "support": 2,
+      "total": 9,
+      "confidence": 0.2222222222222222
+    },
+    "f": {
+      "phone_id": 17,
+      "support": 2,
+      "total": 9,
+      "confidence": 0.2222222222222222
+    },
+    "g": {
+      "phone_id": 20,
+      "support": 1,
+      "total": 2,
+      "confidence": 0.5
+    },
+    "h": {
+      "phone_id": 19,
+      "support": 3,
+      "total": 6,
+      "confidence": 0.5
+    },
+    "i": {
+      "phone_id": 21,
+      "support": 6,
+      "total": 24,
+      "confidence": 0.25
+    },
+    "k": {
+      "phone_id": 24,
+      "support": 5,
+      "total": 14,
+      "confidence": 0.35714285714285715
+    },
+    "l": {
+      "phone_id": 25,
+      "support": 3,
+      "total": 20,
+      "confidence": 0.15
+    },
+    "m": {
+      "phone_id": 12,
+      "support": 2,
+      "total": 10,
+      "confidence": 0.2
+    },
+    "n": {
+      "phone_id": 27,
+      "support": 4,
+      "total": 15,
+      "confidence": 0.26666666666666666
+    },
+    "o": {
+      "phone_id": 41,
+      "support": 2,
+      "total": 12,
+      "confidence": 0.16666666666666666
+    },
+    "p": {
+      "phone_id": 31,
+      "support": 6,
+      "total": 15,
+      "confidence": 0.4
+    },
+    "r": {
+      "phone_id": 33,
+      "support": 8,
+      "total": 19,
+      "confidence": 0.42105263157894735
+    },
+    "s": {
+      "phone_id": 34,
+      "support": 13,
+      "total": 32,
+      "confidence": 0.40625
+    },
+    "t": {
+      "phone_id": 36,
+      "support": 4,
+      "total": 13,
+      "confidence": 0.3076923076923077
+    },
+    "u": {
+      "phone_id": 9,
+      "support": 1,
+      "total": 2,
+      "confidence": 0.5
+    },
+    "v": {
+      "phone_id": 15,
+      "support": 1,
+      "total": 3,
+      "confidence": 0.3333333333333333
+    },
+    "w": {
+      "phone_id": 41,
+      "support": 3,
+      "total": 9,
+      "confidence": 0.3333333333333333
+    },
+    "y": {
+      "phone_id": 43,
+      "support": 2,
+      "total": 10,
+      "confidence": 0.2
+    },
+    "z": {
+      "phone_id": 9,
+      "support": 1,
+      "total": 2,
+      "confidence": 0.5
+    }
+  },
+  "n_pairs": 338,
+  "n_texts": 30
+}

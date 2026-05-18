@@ -1,0 +1,525 @@
+###NOTE###
+This file originally comes from https://web.archive.org/web/20061015011102if_/http://www.nws.noaa.gov/ops2/crs/document/vip_dicta.txt and is a Speechify dictionary/replacement list for the National Weather Service dated June 2002. It is used to help Speechify pronounce weather-related words and phrases correctly. The original file contains a list of words and phrases, along with their corresponding pronunciations or substitutions. The pronunciations are mostly given in SPR format (see the repo's README and the source for bin/spfy_dumpwav.c for more info, the SPR format entries look like this: \![...]). The original file is organized into sections, with some common weather words listed first, followed by a more extensive list of words and phrases. There is also a section for general digit substitutions, which helps Speechify pronounce numbers correctly in the context of weather reports. Use this however you wish. The original file in its entirety is below and can be found without this note at the link above. This note is only for posterity purposes. Thanks to @cajuninthesouth8075 on Discord for sending this along to me! -Wags
+###END NOTE###
+
+VIP DICTIONARY/PRE-PROCESSOR HELP LIST
+COMPILED BY RAYMOND TANABE (WFO LOX)
+LAST UPDATED: 16 JUNE 2002
+--------------------------------------
+
+# SOME COMMON WEATHER WORDS
+buoy,boo'uey
+buoy,\![1buw0i]
+buoy,\![b1uxi]
+cloudy,\![1klWDi]\
+cloudy,1klWF.0Fi
+cloudy,\![1klWDi]
+fog,\![01.fa.h.g]
+foggy,fawgy
+fog,faug
+fog,\![f1cg]
+hail,hayel
+rainfall,\![1renfal]
+sunny,\![1sHni]
+sunny,\![1ssH1ni]
+
+# REST OF THE STUFF
+10 knots or less,10 nauts or less
+13,\![.1TRt.1tin]
+14,\![.1fort.1tin]
+15,\![.1fIfft.1tin]
+16,\![.1sIkst.tin]
+17,\![.1sEvnt.1tin]
+18,\![.1et.1tin]
+19,\![.1nYnt.1tin]
+15 TO 25 MPH,15 to 30 MPH
+17th,seventeenth
+25 TO 35 MPH,25 to 40 MPH
+35 TO 45 MPH,35 to 50 MPH
+41,forty one
+42,forty two
+43,forty three
+44,forty four
+45,forty five
+46,forty six
+47,forty seven
+48,forty eight
+49,forty nine
+82. ,82!
+83. ,83!
+89. ,89!
+92. ,92!
+93. ,93!
+99. ,99!
+12:00 AM,midnight
+1:00 AM,one ay em
+2:00 AM,two ay em
+3:00 AM,three ay em
+4:00 AM,four ay em
+5:00 AM,five ay em
+6:00 AM,six ay em
+7:00 AM,seven ay em
+8:00 AM,eight ay em
+9:00 AM,nine ay em
+10:00 AM,ten ay em
+11:00 AM,eleven ay em
+12:00 PM,noon
+1:00 PM,one p em
+2:00 PM,two p em
+3:00 PM,three p em
+4:00 PM,four p em
+5:00 PM,five p em
+6:00 PM,six p em
+7:00 PM,seven p em
+8:00 PM,eight p em
+9:00 PM,nine p em
+10:00 PM,ten p em
+11:00 PM,eleven p em
+a trace,\![a.1tres]
+aboite,uh boite
+above normal,above \![.1nor.mxll]
+adrian,\![1e.dri.xn]
+agate,\![1A.0gIt]
+albin,\![1cl.bIn]
+albion,\![1Al.bi.xn]
+ALTONA,aal tona
+amish,ahmish
+AM observations,Ay em \![.1abs.R.ve.Snz]
+and rising,and'rising
+andrews,ann drooz
+antelope valley, ant-lope valley
+antwerp,\![An.1twRp]
+ARCANA,arkayna
+archbold,\![1arC.2bold]
+argos,ar gose
+arguello,arguayo
+at Alliance, in \![.1H.1lY.xns]
+at Casper,in \![.1kAs.pR]
+at Cheyenne,in \![.1SY.1An]
+at Denver,in denver
+at Douglas,in douglas
+at Fort Collins,in \![forFt.1kalInz]
+at Laramie,in laramie
+at Rapid City,\![At.1rAp.Id.2sIti]
+at Rawlins,in rawlins
+at Scottsbluff,in \![.1skats.1blHff]
+at Sidney,in \![.1sId.2ni]
+at Torrington,in torrington
+ayersville,airz ville
+avalon,avalaun
+baer,bayerh
+baggs,\![bAggz]
+bakersfield,bakers field
+bass lake,\![bAs.1lek]
+bass station,\![bAs.1ste.Sxn]
+Batavia,batayvia
+beaverdam,beaver dam
+BELLFOUNTAIN,bell fountain
+berrien,\![1berixn]
+BLAKESLEE,blakes lee
+bloomington,\![1blumIG.2tIN]
+bosler,\![.1baz.lR]
+Box Butte dam,box butte \!p100 dam
+britton,brittun
+broadwater,\![.1brcd.0waF.R]
+broughton,\![1brW.txn]
+bushnell,\![.1bUS.nxl]
+buoy,boo'uey
+buoy,\![1buw0i]
+buoy,\![b1uxi]
+burbank,berbaank
+burket,\![1bRkxt]
+cabrillo beach,caybriyo--beach
+cairo,karo
+camarillo,camariyo
+casper,\![.1kAs.2pR]
+cassopolis,\![kxs.1ap.olIs]
+celsius,cell seeus
+celcius,cell shus
+centennial,\![.2sIn.1tIn.ixl]
+CEYLON,say lonn
+chadron,\![1SAd.1rN]
+CHAPIN,chaypin
+charloe,\![1Car.1lo]
+chappell,\![.1CAp.0xl]
+cheyenne,\![1SYy.1An]
+chippewanuck,\![CIpx1wcnHk]
+CICOTT,sigh cott
+CHURUBUSCO,chareuhbusco
+cloudiness,\![1klW.di.2nxs]
+cloudy,\![1klWF.0Fi]
+cloudy, clowd ee {"ok" for donna, craig has trouble}
+coastal valleys,coastal, valleys
+coesse,co essy
+coeur,core
+converse,\![1kan.vRs]
+cosperville,cawsperville
+county valleys,county \!p1 valleys
+cr,creek
+dailey,\![1de.li]
+dana,dayna
+dawn,\![1dcxn]
+degrees,\![1dx.0gris]
+dekalb,de kalb
+delong,\![2dx.1lcG]
+delphos,\![1dEl.2fos]
+develop,\![dx.1vEl.xp]
+developing,\![dx.1vEl.xp.IG]
+diablo,diahblo
+Dowagiac,dwajack
+during,\![1dR.2IG]
+dry,\![drY]
+due to,\![.1du.1tu]
+dunlap,\![1dHn.2lAp]
+during,\![1dRIG]
+east,\![ist]
+Eau Claire,aw clare
+eightmile,ate mile
+el capitan,el capih-tan
+ELIDA,uh lye duh
+elmo,\![1El.mo]
+elsewhere,\![1ElswAr]
+esterbrook,\![1Est.r.brUk]
+etna,et nuh
+evanston,\![.1Ev.xn.2stxn]
+fiat,fee yaht
+findley,\![1fIndli]
+Foraker,forayker
+for this evening,\![.1for.0DIs.2iv.2nIG]
+FOR TODAY,four today
+FOR TONIGHT,four tonight
+FOR SUNDAY,four Sunday
+FOR SUNDAY NIGHT,four \![.1sHn.de.1nYt]
+FOR MONDAY,four monday
+FOR MONDAY NIGHT,four monday night
+FOR TUESDAY,four tuesday
+FOR TUESDAY NIGHT,four tuesday night
+FOR WEDNESDAY,four wednesday
+FOR WEDNESDAY NIGHT,four wednesday night
+FOR THURSDAY,four thursday
+FOR THURSDAY NIGHT,four thursday night
+FOR FRIDAY,four friday
+FOR FRIDAY NIGHT,four friday night
+FOR SATURDAY,four saturday
+FOR SATURDAY NIGHT,four \![.1sAt.xr..1de.nYt]
+Fort Collins,\![forFt.1kalInz]
+ft shawnee,fort shawnee
+ft. shawnee,fort shawnee
+fowlerton,\![1fWlxrtxn]
+francesville,francis ville
+ft jennings,fort jennings
+ft. jennings,fort jennings
+fulton,\![1fxl.0tIn]
+fulton,fullton
+galien,\![1ge.li.xn]
+galveston,\![gAl.1vEs.txn]
+galwin,gawlwin
+generally,\![1JEnrIli]
+gering,\![1gEr.IG]
+Girard,juhr ard
+girardeau,\![JI1Rardo]
+goodland,\![.1gUd.lxnd]
+GOSHEN,goeshen
+goshen,\![1goS.In]
+GRABILL,graybill
+granger,grain zhur
+greiton,grayton
+hail,hayel
+hanna,\![.1hAn.nx]
+haskell,\![1hAs.2kxl]
+havana,\![0hH1vAnx]
+haviland,\![1hAv.xl.lxnd]
+headlee,\![1hEd.li]
+hemingford,\![.1hIm.IG.fxrd]
+hermosa,hermohsaa
+hoagland,\![1hog.2lxnd]
+hodunk,\![1ho.2dHGk]
+hoover,hoo ver
+ijamsville,\![1IJ.xmz.vIl]
+in surrounding,in \![.2sR.1Wnd.IG]
+INDIANA,indee an uh
+1 65,interstate 65
+I-65,interstate 65
+1 69,interstate 69
+I-69,interstate 69
+I 75,interstate 75
+I-75,interstate 75
+1 80,interstate 80    #######################################
+I-80,interstate 80    # For the interstates, also suggested #
+I 80/90,toll road     # to use general digit substitution   #
+I-80/90,toll road     # see general digit sub section at    #
+I 90,interstate 90    # bottom.                             #
+I-90,interstate 90    #######################################
+I 94,interstate 94
+I-94,interstate 94
+inwood,\![1In.wUd]
+it was cloudy,it was \![.1klWF.Fi]
+joliet,\![Joli1Et]
+KALIDA,kuh lye duh
+kaskaskia,\![kAs1kAski2yH]
+kearney,\![1kar.0niy]
+kemp,kemp
+KEWANNA,kuhwahnah
+kewanee,\![ki1waNiy]
+keystone,\![1ki.1ston]
+kickapoo,\![1kIka2pu]
+kimmell,kiml
+kinderhook,\![1kIn.dR.hUk]
+kingsland,\![1kiGz.lxnd]
+kokomo,\![1ko.2kx.mo]
+kortes,\![1kor.tEz]
+Kosciusko,kahzeeahsko
+la crosse,\![2lH.1krcs]
+la fontaine,luh fountain
+lagrange,luh grange
+la grange,luh grange
+La grange,\![.2lx.1grenJ]
+lagrange,\![lH.1grenJ]
+lagro,\![lx.1gro]
+la jolla,lah-hoy-uh
+landeck,\![1lAn.1dEk]
+lapaz,\![2lx.1pAz]
+la paz,\![2lx.1pAz]
+laporte,\![2lx.1port]
+la porte,\![2lx.1port]
+lasalle,\![lH1sAl]
+LENAWEE,lennaway
+Leonidas,leeonighdas
+LEONIDAS,leeonighdas
+lewellen,\![lU.1wEl.In]
+LIMA,lyema
+limberlost,limber lost
+lincoln,link in
+logan,\![1logiN]
+logansport,\![1lo.gxnz.port]
+lompoc,lompoak
+lower,loer
+lower,\![1lo.R]
+lugar,\![1lu.gxr]
+luis,louis
+LYDICK,lyedik
+macomb,\![mH1komb]
+marcellus,\![2mar.1sEl.2Hs]
+MARDENIS,mardennis
+marion,\![1mAr.i.xn]
+marquette,\![mar1kxt]
+marsland,\![.1marz.2lxnd]
+martinsville,\![1martInsvIl]
+mattoon,\![mAt1tun]
+maxinkuckee,\![2mAks.In.1kH.ki]
+mcclure,\![2mx.1kluR]
+mccook,\![.2mx.1kUk]
+mc clure,\![2mx.1kluR]
+mc gill,mick gill
+mc grawsville,mick grawzville
+mcgrawsville,mick grawsville
+MEDARYVILLE,muhdairyvil
+melbeta,\![.0mEl.1biF.2x]
+menard ,\![mEn1ard]
+mentone,\![1mEn.2ton]
+meredosia,\![mErx1doSH]
+metea,\![mx.1te.x]
+michigan,\![1mIS.I.gxn]
+michigan,\![1mISxgxN]
+mishawaka,mish a wauka
+michiana,\![mIS.i.1An.H]
+mid 50s,\![.1mIdd.2fIf.0tiz]
+mid 80s,mid \![.1eF.1iz]
+midnight,\![1mId.nYt]
+miles an hour,miles-an-hour
+minatare,\![.1mIn.x.2ter]
+mississinewa,\![mIs.sIz.1sIn.x.wx]
+moline,\![mo1lin]
+monon,moe non
+MONTICELLO,monta sello
+monticello,\![2mcn0tE1sElo]
+morrill,\![.1mcr.0xl]
+Moscow,moscoe
+mostly cloudy,\![.1most.li.0klWF.Fi]
+Muddy Gap,mud ea \!p100 gap
+mph,miles-an-hour
+mt etna,mount etna
+mt. etna,mount etna
+mt zion,mount zion
+mt. zion,mount zion
+mt,mount
+mt.,mount
+mugu,moog-oo
+nappanee,\![1nAp.x.ni]
+nebraska,\![nx1brAskx]
+New jersey,\![.1nu.Jer.si]
+nevada mills,\![nx.1vA.dx.mIlz]
+new corydon,noo corydun
+nicolas,nicholas
+normal,\![1norm.2xl]
+normally,\![1norm.x.li]
+nottawa,\![1nat.a.wa]
+numerous,\![1numrxs]
+observations,\![.1abz.R.ve.Snz]
+offshore,off shore
+ogallala,\![.1o.gx.2la.lx]
+okolona,\![2okx.1lo.nx]
+omaha,\![.1o.2mx.0hcx]
+ora,\![1orH]
+OSCEOLA,ohseeohluh
+osseo,awsseeoh
+ossian,awsseeuhn
+otis,ohtiss
+oxnard,oxnaard
+palestine,\![1pAl.xs.tYn]
+PALMYRA,paul my ruh
+partly cloudy,\![.1part.li.klWF.0Fi]
+peru,\![2px.1ru]
+pekin,\![1pikN]
+peoria,\![1piorix]
+piedras,piaydras
+pierre,\![pir]
+PM observations,p em \![.1abs.R.ve.Snz]
+pocatello,poka tell o
+point loma,point, loma
+pokagon,\![2po.1ke.2gxn]
+possible,\![1pas.I.bUl]
+possibly,\![1pa.sx.bli]
+preble,preebl
+pt san luis,port san-louis
+PULASKI,puhlasskaaeye
+ramsey,\![1rAmziy]
+rantoul,\![rAn1tul]
+Rapid City,\![.1rAp.Id.2sIti]
+rawlins,\![1rcl.Inz]
+READING,redding
+reiffsburg,reefs burg
+richland,\![1rIClENd]
+riga,reega
+rivare,\![2rx.1var]
+roanoke,row uh noke
+robles, robeless
+route,\![rWt]
+ROSELMS,rohz elms
+salina,\![2sx.1lYn.x]
+san francisco, san-francisco
+san luis, san-louis
+san martin,san-martin
+san mateo,san matayeo
+san pedro,san-pedro
+san pierre,\![2sAn.1pir]
+santa ana,santa ann uh
+santa ynez,santa ey-nezz
+SCHUMM,shoom
+scottsbluff,\![.1skats.2blHff]
+seminoe,\![.1sIm.I.no]
+seventeenth,\![sEvIn.1tinT]
+seyberts,see berts
+shortpause,\![[]]
+sidney,\![1sId.ni]
+southworth,\![1sWT.wRT]
+southern deserts,southern /!p1 deserts
+speicherville,speaker ville
+steuben,\![2stu.1bEn]
+st joe,saint joe
+st joseph,saint joseph
+st. joseph,saint joseph
+st marys,saint mareez
+st. marys,saint mareez
+sundance,\![1sHn.dAns]
+sunday night,sunday, night
+sunday through,sunday, through
+sunny,\![1sHn.i]
+sunny,sunnee
+sunny,sun knee {"ok" for donna, craig has trouble}
+surrounding,\![2sR.1Wnd.IG]
+swayzee,\![1swe.zi]
+TALMA,tawhlmuh
+tekamah,\![1tEk.2am.a]
+temperature,\![.1tEmp.R.2x.CR]
+the normal,the \![1nor.mxll]
+thornhope,thorn hope
+thursday,\![1TRzde]
+time observations,time \!p150 observations
+TIOSA,tie oh suh
+TIPPECANOE,tip ih cuh noo
+TO,TO
+to 2.@@,to two point @ @
+tornado	\![1tor.1ne.0Fo]
+townwood,\![1tWn.wxd]
+traveling,\![1trAv.2lIG]
+under sunny,under \![.1sHn.i]
+upland,\![1Hp.lxnd]
+upslope,\![.1xps.lop]
+urbana,\![R1bAnH]
+Vandalia,vanndaylia
+VANDALIA,vanndaylia
+van wert,\![vAn.1wRt]
+vedauwoo,\![.1vi.2dx.wu]
+ventura,ven-tworah
+vicinity,\![vI1sIn2Iti]
+vineland,\![1vYn2lxnd]
+wakarusa,\![1wa.kx.ru.sa]
+wakelee,\![1wek.li]
+wamsutter,\![.1wam.2sHt.0R]
+WANATAH,wahnutaw
+wasepi,\![wc.1si.pi]
+Watervliet,watervliete
+wauseon,\![1wc.si.xn]
+wawaka,wawa kuh
+wawpecong,\![1wc.px.kaG]
+weak eddy,weak, eddy
+westhope,west hope
+wheatland,\![.1wit.0lxnd]
+whitaker,\![.1wIt.xk.R]
+WILLSHIRE,will shire
+wilmot,wil mott
+winamac,win uh mac
+wind,\![wInd]
+winds,\![wInz]
+wind waves,windwaves
+WNW,west northwest
+wolcott,wahl cott
+WOLCOTTVILLE,wall cot ville
+woodruff,wood rough
+yoder,\![1yo.dR]
+
+#GENERAL DIGIT SUBST.
+
+PM.,pee em. \!p300
+@@@ AM,@:@@ Ay em
+@@@@ AM,@@:@@ Ay em
+@@@ PM,@:@@ P M
+@@@@ PM,@@:@@ P M
+@:@@ AM,@:@@ Ay em
+@@:@@ AM,@@:@@ Ay em
+@:@@ PM,@:@@ P M
+@@:@@ PM,@@:@@ P M
+@@ degrees,@@ \![1dx.0gris]
+to 2.@@,to two point @ @
+WIND @,wihnd @
+WIND @@,wihnd @@
+WIND @@@,wihnd @@@
+WIND @ to @,wihnd @ to @
+WIND @@ to @@,wihnd @@ to @@
+WIND @@ to @@@,wihnd @@ to @@@
+WIND @@@ to @@@,wihnd @@@ to @@@
+WINDS,wihnds
+WINDS @,wihnds @
+WINDS @@,wihnds @@
+WINDS @@@,wihnds @@@
+WINDS @ to @,wihnds @ to @
+WINDS @ to @@,wihnds @ to @@
+WINDS @@ to @@,wihnds @@ to @@
+WINDS @@ to @@@,wihnds @@ to @@@
+WINDS @@@ to @@@,wihnds @@@ to @@@
+
+
+# These substitutions should remain
+# in this order!
+B@@,@@ degrees below zero
+B@@@,@@@ degrees below zero
+@@@B,@@@ degrees below zero
+@@B,@@ degrees below zero
+B@,@ degrees below zero
+@B,@ degrees below zero
+
+-@,minus @
++@,plus @
+-@@,minus @@
++@@,plus @@

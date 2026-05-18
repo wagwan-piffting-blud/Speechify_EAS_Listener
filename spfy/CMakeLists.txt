@@ -53,6 +53,17 @@ if(NOT WIN32)
     link_libraries(m)
 endif()
 
+# MinGW: static-link libgcc + libstdc++ + libwinpthread so the produced
+# binaries don't depend on mingw runtime DLLs (libgcc_s_dw2-1.dll,
+# libwinpthread-1.dll, libstdc++-6.dll) that aren't present on stock
+# Windows. Without this, regsvr32 on a fresh VM returns exit code 3
+# ("failed to load module") when the SAPI DLL tries to load.
+# add_link_options applies to every executable and shared library
+# created in subsequent add_subdirectory() calls.
+if(MINGW)
+    add_link_options(-static-libgcc -static)
+endif()
+
 add_subdirectory(src/common)
 add_subdirectory(src/voice)
 add_subdirectory(src/cart)

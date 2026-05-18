@@ -30,3 +30,7 @@ diagnostics/
 !reveng/voice_cloning/rvc_input_flashsr/*.wav
 CMakeCache.txt
 RESUME.md
+!.github
+installer/dist/
+!spfy/data/
+!spfy/data/**

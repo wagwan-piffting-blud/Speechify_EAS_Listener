@@ -1,5 +1,3 @@
-build/
-build-*/
 *.o
 *.a
 *.so
@@ -10,3 +8,5 @@ compile_commands.json
 .cmake/
 CMakeUserPresets.json
 t*.bin
+!data/**
+!build/**

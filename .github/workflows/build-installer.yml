@@ -1,0 +1,348 @@
+# Build the Speechify installers (Windows + Linux).
+#
+# Triggers:
+#   * Branch push to main  — builds both platforms and publishes a
+#     dated GitHub Release with the Windows .exe and the Linux .tar.gz.
+#   * workflow_dispatch     — manual trigger; uploads as artifacts only,
+#     no release.
+#
+# Jobs:
+#   * setup          — resolves the date-based version once so both
+#                      builds and the release agree on the string.
+#   * build-windows  — msys2 mingw32/mingw64 + Inno Setup. Produces
+#                      spfy-setup-<version>.exe (registers SAPI, drops
+#                      the FE data into %USERPROFILE%\Documents).
+#   * build-linux    — ubuntu-latest with gcc-multilib (-m32; the FE
+#                      DLL we host is 32-bit Windows PE so the loader
+#                      must run in a 32-bit address space). No SAPI —
+#                      not everyone runs Wine. Produces
+#                      spfy-linux-x86-<version>.tar.gz.
+#   * release        — runs after both builds succeed on push events;
+#                      attaches both packages to one Release.
+#
+# Toolchains:
+#   * Windows: msys2 mingw32 (i686) for the main project + 32-bit SAPI
+#     DLL, msys2 mingw64 (x86_64) for the 64-bit SAPI shim, Inno Setup 6
+#     via Chocolatey.
+#   * Linux: stock gcc with gcc-multilib (i386 cross), cmake, ninja.
+#
+# The FE DLL (SWIttsFe-en-US.dll) is committed at bin/ in the repo and
+# is embedded into spfy_sapi.dll + spfy_synth(.exe) at build time via
+# embed_dll.py — no proprietary asset wrangling needed in CI.
+
+name: Build installer
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      version_override:
+        description: "Version string to stamp on the installer (default: today's UTC date as YYYY.MM.DD)"
+        required: false
+
+permissions:
+  contents: write     # needed to create / update a Release
+
+jobs:
+  # --------------------------------------------------------------------
+  # setup — resolve the date-based version once, share with both builds
+  # and the release job so they all agree on the string.
+  # --------------------------------------------------------------------
+
+  setup:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.ver.outputs.version }}
+      versioninfo: ${{ steps.ver.outputs.versioninfo }}
+    steps:
+      - name: Resolve version
+        id: ver
+        run: |
+          # Date-based versioning (calver). Avoids the maintenance burden
+          # of semver/v-tags and prevents confusion with unrelated GitHub
+          # releases (most of which are v1/v2/v3).
+          #
+          # Two outputs:
+          #   version      — user-facing date string (YYYY.MM.DD), used in
+          #                  filenames, artifact names, release tag, and
+          #                  AppVersion.
+          #   versioninfo  — PE VersionInfo string (YYYY.MM.DD.RUN). Inno
+          #                  Setup's VersionInfoVersion is strict X.X.X.X
+          #                  numeric; the GitHub run number gives us a
+          #                  monotonic 4th component for same-day rebuilds.
+          override="${{ github.event.inputs.version_override }}"
+          if [ -n "$override" ]; then
+            v="$override"
+          else
+            v="$(date -u +%Y.%m.%d)"
+          fi
+          run_num="${{ github.run_number }}"
+          [ -z "$run_num" ] && run_num="0"
+          if [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            vinfo="$v"
+          elif [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            vinfo="$v.$run_num"
+          else
+            vinfo="0.0.0.$run_num"
+          fi
+          echo "Version:     $v"
+          echo "VersionInfo: $vinfo"
+          echo "version=$v"         >> "$GITHUB_OUTPUT"
+          echo "versioninfo=$vinfo" >> "$GITHUB_OUTPUT"
+
+  # --------------------------------------------------------------------
+  # build-windows — msys2 + Inno Setup. Produces the .exe installer.
+  # --------------------------------------------------------------------
+
+  build-windows:
+    needs: setup
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: pwsh
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: false
+
+      # --------------------------------------------------------------
+      # msys2 — install BOTH 32-bit and 64-bit toolchains in one shot
+      # --------------------------------------------------------------
+
+      - name: Set up msys2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            base-devel
+            mingw-w64-i686-toolchain
+            mingw-w64-i686-cmake
+            mingw-w64-i686-ninja
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            python
+
+      # --------------------------------------------------------------
+      # Build the 32-bit project (CMake + Ninja, mingw32 toolchain)
+      # --------------------------------------------------------------
+
+      - name: Configure 32-bit
+        shell: msys2 {0}
+        run: |
+          export PATH="/mingw32/bin:$PATH"
+          mkdir -p /tmp/spfy_build32
+          /mingw64/bin/cmake.exe \
+            -S "$(cygpath -u '${{ github.workspace }}')/spfy" \
+            -B /tmp/spfy_build32 \
+            -G Ninja \
+            -DCMAKE_MAKE_PROGRAM=/mingw64/bin/ninja.exe \
+            -DCMAKE_C_COMPILER=/mingw32/bin/gcc.exe \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DSPFY_STRICT_FP=OFF \
+            -DSPFY_BUILD_TESTS=OFF \
+            -DSPFY_FE_HOSTED=ON
+
+      - name: Build 32-bit
+        shell: msys2 {0}
+        run: |
+          export PATH="/mingw32/bin:$PATH"
+          /mingw64/bin/cmake.exe --build /tmp/spfy_build32
+
+      # --------------------------------------------------------------
+      # Build the 64-bit SAPI shim (mingw64, standalone gcc invocation)
+      # --------------------------------------------------------------
+
+      - name: Build 64-bit SAPI shim
+        shell: msys2 {0}
+        run: |
+          SRCDIR="$(cygpath -u '${{ github.workspace }}')/spfy/src/sapi"
+          DSPDIR="$(cygpath -u '${{ github.workspace }}')/spfy/src/dsp"
+          OUTDIR="/tmp/spfy_build32/src/sapi"
+          mkdir -p "$OUTDIR"
+          # -static -static-libgcc: avoid runtime dep on libgcc_s_seh-1.dll
+          # / libwinpthread-1.dll on stock Windows VMs.
+          /mingw64/bin/gcc.exe -shared -O2 \
+            -DUNICODE -D_UNICODE -DWIN32_LEAN_AND_MEAN -DCOBJMACROS -DCINTERFACE \
+            -I "$SRCDIR" -I "$DSPDIR" \
+            -o "$OUTDIR/spfy_sapi64.dll" \
+            "$SRCDIR/spfy_sapi64.c" \
+            "$DSPDIR/pitch_shift.c" \
+            "$DSPDIR/time_stretch.c" \
+            "$SRCDIR/spfy_sapi64.def" \
+            -lole32 -loleaut32 -ladvapi32 -lshell32 -luuid \
+            -static -static-libgcc \
+            -Wl,--kill-at \
+            -Wl,--out-implib,"$OUTDIR/libspfy_sapi64.dll.a"
+
+      - name: Verify build outputs
+        shell: msys2 {0}
+        run: |
+          ls -la /tmp/spfy_build32/src/sapi/spfy_sapi.dll
+          ls -la /tmp/spfy_build32/src/sapi/spfy_sapi64.dll
+          ls -la /tmp/spfy_build32/src/cli/spfy_synth.exe
+          file /tmp/spfy_build32/src/sapi/spfy_sapi.dll
+          file /tmp/spfy_build32/src/sapi/spfy_sapi64.dll
+
+      # --------------------------------------------------------------
+      # Inno Setup — package the installer
+      # --------------------------------------------------------------
+
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress --yes
+
+      - name: Build installer
+        run: |
+          $iscc = "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe"
+          if (-not (Test-Path $iscc)) {
+            $iscc = "${env:ProgramFiles}\Inno Setup 6\ISCC.exe"
+          }
+          & $iscc `
+            /DBuildDir="C:\tmp\spfy_build32" `
+            /DSourceRoot="${{ github.workspace }}" `
+            /DSpfyVersion="${{ needs.setup.outputs.version }}" `
+            /DSpfyVersionInfo="${{ needs.setup.outputs.versioninfo }}" `
+            "${{ github.workspace }}\installer\spfy_setup.iss"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Inno Setup compile failed"
+            exit 1
+          }
+          Get-ChildItem "${{ github.workspace }}\installer\dist\"
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spfy-installer-windows-${{ needs.setup.outputs.version }}
+          path: installer/dist/*.exe
+          if-no-files-found: error
+          retention-days: 30
+
+  # --------------------------------------------------------------------
+  # build-linux — i386 cross build via gcc-multilib. No SAPI (Windows
+  # COM only); ships spfy_synth CLI + the runtime data files needed to
+  # synthesize against a user-provided voice (VIN/VDB/VCF). Voices stay
+  # proprietary and are not bundled.
+  # --------------------------------------------------------------------
+
+  build-linux:
+    needs: setup
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: false
+
+      - name: Install 32-bit toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            build-essential gcc-multilib g++-multilib \
+            cmake ninja-build python3
+
+      - name: Configure (i386)
+        run: |
+          # Mirrors spfy/build_linux.sh: -m32 reaches the linker so libgcc
+          # / libc come from multilib. SPFY_STRICT_FP=ON keeps x87 80-bit
+          # FP semantics for bit-exactness against the Windows reference.
+          cmake -S spfy -B /tmp/spfy_build_linux32 -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_C_FLAGS="-m32 -D_GNU_SOURCE=1" \
+            -DCMAKE_EXE_LINKER_FLAGS="-m32" \
+            -DCMAKE_SHARED_LINKER_FLAGS="-m32" \
+            -DSPFY_STRICT_FP=ON \
+            -DSPFY_BUILD_TESTS=OFF \
+            -DSPFY_FE_HOSTED=ON
+
+      - name: Build
+        run: cmake --build /tmp/spfy_build_linux32
+
+      - name: Verify build outputs
+        run: |
+          ls -la /tmp/spfy_build_linux32/src/cli/spfy_synth
+          file /tmp/spfy_build_linux32/src/cli/spfy_synth
+
+      - name: Package tarball
+        run: |
+          set -euo pipefail
+          VERSION="${{ needs.setup.outputs.version }}"
+          PKG="spfy-linux-x86-${VERSION}"
+          STAGE="/tmp/spfy-linux-stage/${PKG}"
+          mkdir -p "${STAGE}/bin" "${STAGE}/spfy/data" "${STAGE}/spfy/build"
+          cp /tmp/spfy_build_linux32/src/cli/spfy_synth        "${STAGE}/bin/"
+          cp spfy/data/tom_hpclass.bin                         "${STAGE}/spfy/data/"
+          cp -r spfy/data/fe_tables                            "${STAGE}/spfy/data/"
+          cp -r spfy/data/fe_tables_a                          "${STAGE}/spfy/data/"
+          cp spfy/build/fe_symbol_table.json                   "${STAGE}/spfy/build/"
+          cp spfy/README.md                                    "${STAGE}/" || true
+          # Path layout inside the tarball mirrors the args spfy_synth
+          # expects, so users can extract and run from the package root.
+          mkdir -p installer/dist
+          tar -czvf "installer/dist/${PKG}.tar.gz" -C /tmp/spfy-linux-stage "${PKG}"
+          ls -la installer/dist/
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: spfy-installer-linux-${{ needs.setup.outputs.version }}
+          path: installer/dist/*.tar.gz
+          if-no-files-found: error
+          retention-days: 30
+
+  # --------------------------------------------------------------------
+  # release — dated GitHub Release with both platforms attached. Only
+  # fires on push events (main branch or tag); workflow_dispatch stops
+  # at artifact upload.
+  # --------------------------------------------------------------------
+
+  release:
+    needs: [setup, build-windows, build-linux]
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Windows installer
+        uses: actions/download-artifact@v4
+        with:
+          name: spfy-installer-windows-${{ needs.setup.outputs.version }}
+          path: dist
+
+      - name: Download Linux tarball
+        uses: actions/download-artifact@v4
+        with:
+          name: spfy-installer-linux-${{ needs.setup.outputs.version }}
+          path: dist
+
+      - name: List release payload
+        run: ls -la dist/
+
+      - name: Resolve release tag
+        id: tag
+        run: |
+          # Tag pushes keep their own ref; main pushes get the date version
+          # as a programmatically-created tag (softprops/action-gh-release
+          # creates it from tag_name if it doesn't already exist).
+          if [[ "${GITHUB_REF}" == refs/tags/* ]]; then
+            tag="${GITHUB_REF#refs/tags/}"
+          else
+            tag="${{ needs.setup.outputs.version }}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Create / update release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "spfy ${{ steps.tag.outputs.tag }}"
+          tag_name: ${{ steps.tag.outputs.tag }}
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            dist/spfy-setup-${{ needs.setup.outputs.version }}.exe
+            dist/spfy-linux-x86-${{ needs.setup.outputs.version }}.tar.gz
